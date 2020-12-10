@@ -38,32 +38,25 @@ namespace internal
   {
     namespace
     {
-      //---------------------------------------------------------------------------
-      // Utility method, which is used to determine the change of sign for
-      // the DoFs on the faces of the given cell.
-      //---------------------------------------------------------------------------
-
-      /**
-       * On non-Cartesian grids, the sign of the DoFs associated with the faces
-       * of the elements has to be changed in some cases.  This procedure
-       * implements an algorithm that determines those DoFs that need this
-       * sign change for a given cell.
-       */
       template <int spacedim>
       void
-      get_face_sign_change_rt(const dealii::Triangulation<1>::cell_iterator &,
-                              const FiniteElement<1, spacedim> &,
-                              const std::vector<MappingKind> &,
-                              std::vector<double> &)
+      get_dof_sign_change_h_div(const dealii::Triangulation<1>::cell_iterator &,
+                                const FiniteElement<1, spacedim> &,
+                                const std::vector<MappingKind> &,
+                                std::vector<double> &)
       {
-        // nothing to do in 1d
+        // Nothing to do in 1D.
       }
 
 
-
-      //      template<int spacedim>
+      // TODO: This function is not a consistent fix of the orientation issue
+      // like in 3D. It is rather kept not to break legacy behavior in 2D but
+      // should be replaced. See also the implementation of
+      // FE_RaviartThomas<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+      // or other H(div) conforming elements such as FE_ABF<dim> and
+      // FE_BDM<dim>.
       void
-      get_face_sign_change_rt(
+      get_dof_sign_change_h_div(
         const dealii::Triangulation<2>::cell_iterator &cell,
         const FiniteElement<2, 2> &                    fe,
         const std::vector<MappingKind> &               mapping_kind,
@@ -83,11 +76,11 @@ namespace internal
                 const unsigned int nn = cell->neighbor_face_no(f);
 
                 if (nn < GeometryInfo<dim>::faces_per_cell / 2)
-                  for (unsigned int j = 0; j < fe.n_dofs_per_face(f); ++j)
+                  for (unsigned int j = 0; j < fe.dofs_per_face; ++j)
                     {
                       const unsigned int cell_j = fe.face_to_cell_index(j, f);
 
-                      Assert(f * fe.n_dofs_per_face(f) + j < face_sign.size(),
+                      Assert(f * fe.dofs_per_face + j < face_sign.size(),
                              ExcInternalError());
                       Assert(mapping_kind.size() == 1 ||
                                cell_j < mapping_kind.size(),
@@ -98,7 +91,7 @@ namespace internal
                       if ((mapping_kind.size() > 1 ?
                              mapping_kind[cell_j] :
                              mapping_kind[0]) == mapping_raviart_thomas)
-                        face_sign[f * fe.n_dofs_per_face(f) + j] = -1.0;
+                        face_sign[f * fe.dofs_per_face + j] = -1.0;
                     }
               }
           }
@@ -108,24 +101,23 @@ namespace internal
 
       template <int spacedim>
       void
-      get_face_sign_change_rt(
+      get_dof_sign_change_h_div(
         const dealii::Triangulation<3>::cell_iterator & /*cell*/,
         const FiniteElement<3, spacedim> & /*fe*/,
         const std::vector<MappingKind> & /*mapping_kind*/,
         std::vector<double> & /*face_sign*/)
       {
-        // TODO: think about what it would take here
+        // Nothing to do. In 3D we take care of it through the
+        // adjust_quad_dof_sign_for_face_orientation_table
       }
-
-
 
       template <int spacedim>
       void
-      get_face_sign_change_nedelec(
+      get_dof_sign_change_nedelec(
         const dealii::Triangulation<1>::cell_iterator & /*cell*/,
         const FiniteElement<1, spacedim> & /*fe*/,
         const std::vector<MappingKind> & /*mapping_kind*/,
-        std::vector<double> & /*face_sign*/)
+        std::vector<double> & /*line_dof_sign*/)
       {
         // nothing to do in 1d
       }
@@ -134,11 +126,11 @@ namespace internal
 
       template <int spacedim>
       void
-      get_face_sign_change_nedelec(
+      get_dof_sign_change_nedelec(
         const dealii::Triangulation<2>::cell_iterator & /*cell*/,
         const FiniteElement<2, spacedim> & /*fe*/,
         const std::vector<MappingKind> & /*mapping_kind*/,
-        std::vector<double> & /*face_sign*/)
+        std::vector<double> & /*line_dof_sign*/)
       {
         // TODO: think about what it would take here
       }
@@ -146,11 +138,11 @@ namespace internal
 
       template <int spacedim>
       void
-      get_face_sign_change_nedelec(
+      get_dof_sign_change_nedelec(
         const dealii::Triangulation<3>::cell_iterator &cell,
         const FiniteElement<3, spacedim> & /*fe*/,
         const std::vector<MappingKind> &mapping_kind,
-        std::vector<double> &           face_sign)
+        std::vector<double> &           line_dof_sign)
       {
         const unsigned int dim = 3;
         // TODO: This is probably only going to work for those elements for
@@ -158,12 +150,11 @@ namespace internal
         for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
           if (!(cell->line_orientation(l)) &&
               mapping_kind[0] == mapping_nedelec)
-            face_sign[l] = -1.0;
+            line_dof_sign[l] = -1.0;
       }
     } // namespace
   }   // namespace FE_PolyTensor
 } // namespace internal
-
 
 
 template <int dim, int spacedim>
@@ -188,6 +179,23 @@ FE_PolyTensor<dim, spacedim>::FE_PolyTensor(
   // the component itself
   for (unsigned int comp = 0; comp < this->n_components(); ++comp)
     this->component_to_base_table[comp].first.second = comp;
+
+  if (dim == 3)
+    {
+      adjust_quad_dof_sign_for_face_orientation_table.resize(
+        this->n_unique_quads());
+
+      for (unsigned int f = 0; f < this->n_unique_quads(); ++f)
+        {
+          adjust_quad_dof_sign_for_face_orientation_table[f] = Table<2, bool>(
+            this->n_dofs_per_quad(f),
+            internal::ReferenceCell::get_cell(this->reference_cell())
+                  .face_reference_cell(f) == ReferenceCell::Quadrilateral ?
+              8 :
+              6);
+          adjust_quad_dof_sign_for_face_orientation_table[f].fill(false);
+        }
+    }
 }
 
 
@@ -196,6 +204,8 @@ template <int dim, int spacedim>
 FE_PolyTensor<dim, spacedim>::FE_PolyTensor(const FE_PolyTensor &fe)
   : FiniteElement<dim, spacedim>(fe)
   , mapping_kind(fe.mapping_kind)
+  , adjust_quad_dof_sign_for_face_orientation_table(
+      fe.adjust_quad_dof_sign_for_face_orientation_table)
   , poly_space(fe.poly_space->clone())
   , inverse_node_matrix(fe.inverse_node_matrix)
 {}
@@ -209,6 +219,60 @@ FE_PolyTensor<dim, spacedim>::single_mapping_kind() const
   return mapping_kind.size() == 1;
 }
 
+
+template <int dim, int spacedim>
+void
+FE_PolyTensor<dim,
+              spacedim>::initialize_quad_dof_index_permutation_and_sign_change()
+{
+  AssertThrow(false,
+              ExcMessage(
+                "This method must be implemented in any class derived "
+                "form FE_PolyTensor that is final. This method is"
+                "specific to the (vector) finite element used and "
+                "determines how face_dofs are "
+                "permuted and how they change their sign on cells that "
+                "have non-standard faces, i.e., they can have faces with "
+                "non-standard orientation or be rotated. For an example "
+                "implementation see fe_q_base.cc or fe_raviart_thomas.cc."));
+}
+
+
+template <int dim, int spacedim>
+bool
+FE_PolyTensor<dim, spacedim>::adjust_quad_dof_sign_for_face_orientation(
+  const unsigned int index,
+  const unsigned int face,
+  const bool         face_orientation,
+  const bool         face_flip,
+  const bool         face_rotation) const
+{
+  // do nothing in 1D and 2D
+  if (dim < 3)
+    return false;
+
+  // The exception are discontinuous
+  // elements for which there should be no
+  // face dofs anyway (i.e. dofs_per_quad==0
+  // in 3d), so we don't need the table, but
+  // the function should also not have been
+  // called
+  AssertIndexRange(index, this->n_dofs_per_quad(face));
+  Assert(adjust_quad_dof_sign_for_face_orientation_table
+             [this->n_unique_quads() == 1 ? 0 : face]
+               .n_elements() ==
+           (internal::ReferenceCell::get_cell(this->reference_cell())
+                  .face_reference_cell(face) == ReferenceCell::Quadrilateral ?
+              8 :
+              6) *
+             this->n_dofs_per_quad(face),
+         ExcInternalError());
+
+  return adjust_quad_dof_sign_for_face_orientation_table
+    [this->n_unique_quads() == 1 ? 0 : face](index,
+                                             4 * face_orientation +
+                                               2 * face_flip + face_rotation);
+}
 
 
 template <int dim, int spacedim>
@@ -399,40 +463,82 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
            fe_data.shape_values.size()[1] == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values.size()[1], n_q_points));
 
-  // Create table with sign changes, due to the special structure of the RT
-  // elements.
-  // TODO: Preliminary hack to demonstrate the overall principle!
+  // TODO: The dof_sign_change only affects Nedelec elements and is not the
+  // correct thing on complicated meshes for higher order Nedelec elements.
+  // Something similar to FE_Q should be done to permute dofs and to change the
+  // dof signs. A static way using tables (as done in the RaviartThomas<dim>
+  // class) is preferable.
+  std::fill(fe_data.dof_sign_change.begin(),
+            fe_data.dof_sign_change.end(),
+            1.0);
+  internal::FE_PolyTensor::get_dof_sign_change_nedelec(cell,
+                                                       *this,
+                                                       this->mapping_kind,
+                                                       fe_data.dof_sign_change);
 
-  // Compute eventual sign changes depending on the neighborhood
-  // between two faces.
-  std::fill(fe_data.sign_change.begin(), fe_data.sign_change.end(), 1.0);
+  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2D
+  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1D.
+  // Also nothing in 3D since we take care of it by using the
+  // adjust_quad_dof_sign_for_face_orientation_table.
+  internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
+                                                     *this,
+                                                     this->mapping_kind,
+                                                     fe_data.dof_sign_change);
 
-  internal::FE_PolyTensor::get_face_sign_change_rt(cell,
-                                                   *this,
-                                                   this->mapping_kind,
-                                                   fe_data.sign_change);
+  // What is the first dof_index on a quad?
+  const unsigned int first_quad_index = this->get_first_quad_index();
+  // How many dofs per quad and how many quad dofs do we have at all?
+  const unsigned int n_dofs_per_quad = this->n_dofs_per_quad();
+  const unsigned int n_quad_dofs =
+    n_dofs_per_quad * GeometryInfo<dim>::faces_per_cell;
 
-  internal::FE_PolyTensor::get_face_sign_change_nedelec(cell,
-                                                        *this,
-                                                        this->mapping_kind,
-                                                        fe_data.sign_change);
-
-
-  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+  for (unsigned int dof_index = 0; dof_index < this->n_dofs_per_cell();
+       ++dof_index)
     {
-      const MappingKind mapping_kind = get_mapping_kind(i);
+      /*
+       * This assumes that the dofs are ordered by first vertices, lines, quads
+       * and volume dofs. Note that in 2D this always gives false.
+       */
+      const bool is_quad_dof =
+        (dim == 2 ? false :
+                    (first_quad_index <= dof_index) &&
+                      (dof_index < first_quad_index + n_quad_dofs));
+
+      double dof_sign = 1.0;
+      if (is_quad_dof)
+        {
+          /*
+           * Find the face belonging to this dof_index. This is integer
+           * division.
+           */
+          unsigned int face_index_from_dof_index =
+            (dof_index - first_quad_index) / (n_dofs_per_quad);
+
+          unsigned int local_quad_dof_index = dof_index % n_dofs_per_quad;
+
+          // Correct the dof_sign if necessary
+          if (adjust_quad_dof_sign_for_face_orientation(
+                local_quad_dof_index,
+                face_index_from_dof_index,
+                cell->face_orientation(face_index_from_dof_index),
+                cell->face_flip(face_index_from_dof_index),
+                cell->face_rotation(face_index_from_dof_index)))
+            dof_sign = -1.0;
+        }
+
+      const MappingKind mapping_kind = get_mapping_kind(dof_index);
 
       const unsigned int first =
-        output_data.shape_function_to_row_table[i * this->n_components() +
-                                                this->get_nonzero_components(i)
-                                                  .first_selected_component()];
+        output_data.shape_function_to_row_table
+          [dof_index * this->n_components() +
+           this->get_nonzero_components(dof_index).first_selected_component()];
 
       // update the shape function values as necessary
       //
       // we only need to do this if the current cell is not a translation of
-      // the previous one; or, even if it is a translation, if we use mappings
-      // other than the standard mappings that require us to recompute values
-      // and derivatives because of possible sign changes
+      // the previous one; or, even if it is a translation, if we use
+      // mappings other than the standard mappings that require us to
+      // recompute values and derivatives because of possible sign changes
       if (fe_data.update_each & update_values &&
           ((cell_similarity != CellSimilarity::translation) ||
            ((mapping_kind == mapping_piola) ||
@@ -446,22 +552,23 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        fe_data.shape_values[i][k][d];
+                        fe_data.shape_values[dof_index][k][d];
                   break;
                 }
 
               case mapping_covariant:
               case mapping_contravariant:
                 {
-                  mapping.transform(make_array_view(fe_data.shape_values, i),
-                                    mapping_kind,
-                                    mapping_internal,
-                                    make_array_view(
-                                      fe_data.transformed_shape_values));
+                  mapping.transform(
+                    make_array_view(fe_data.shape_values, dof_index),
+                    mapping_kind,
+                    mapping_internal,
+                    make_array_view(fe_data.transformed_shape_values));
 
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_values[k][d];
 
                   break;
@@ -470,31 +577,31 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
               case mapping_raviart_thomas:
               case mapping_piola:
                 {
-                  mapping.transform(make_array_view(fe_data.shape_values, i),
-                                    mapping_piola,
-                                    mapping_internal,
-                                    make_array_view(
-                                      fe_data.transformed_shape_values));
+                  mapping.transform(
+                    make_array_view(fe_data.shape_values, dof_index),
+                    mapping_piola,
+                    mapping_internal,
+                    make_array_view(fe_data.transformed_shape_values));
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        fe_data.sign_change[i] *
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_values[k][d];
                   break;
                 }
 
               case mapping_nedelec:
                 {
-                  mapping.transform(make_array_view(fe_data.shape_values, i),
-                                    mapping_covariant,
-                                    mapping_internal,
-                                    make_array_view(
-                                      fe_data.transformed_shape_values));
+                  mapping.transform(
+                    make_array_view(fe_data.shape_values, dof_index),
+                    mapping_covariant,
+                    mapping_internal,
+                    make_array_view(fe_data.transformed_shape_values));
 
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        fe_data.sign_change[i] *
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_values[k][d];
 
                   break;
@@ -517,24 +624,25 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
             {
               case mapping_none:
                 {
-                  mapping.transform(make_array_view(fe_data.shape_grads, i),
-                                    mapping_covariant,
-                                    mapping_internal,
-                                    make_array_view(
-                                      fe_data.transformed_shape_grads));
+                  mapping.transform(
+                    make_array_view(fe_data.shape_grads, dof_index),
+                    mapping_covariant,
+                    mapping_internal,
+                    make_array_view(fe_data.transformed_shape_grads));
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_grads[k][d];
                   break;
                 }
               case mapping_covariant:
                 {
-                  mapping.transform(make_array_view(fe_data.shape_grads, i),
-                                    mapping_covariant_gradient,
-                                    mapping_internal,
-                                    make_array_view(
-                                      fe_data.transformed_shape_grads));
+                  mapping.transform(
+                    make_array_view(fe_data.shape_grads, dof_index),
+                    mapping_covariant_gradient,
+                    mapping_internal,
+                    make_array_view(fe_data.transformed_shape_grads));
 
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < spacedim; ++d)
@@ -546,6 +654,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_grads[k][d];
 
                   break;
@@ -554,7 +663,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_grads[k] =
-                      fe_data.shape_grads[i][k];
+                      fe_data.shape_grads[dof_index][k];
                   mapping.transform(
                     make_array_view(fe_data.untransformed_shape_grads),
                     mapping_contravariant_gradient,
@@ -572,6 +681,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_grads[k][d];
 
                   break;
@@ -581,7 +691,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_grads[k] =
-                      fe_data.shape_grads[i][k];
+                      fe_data.shape_grads[dof_index][k];
                   mapping.transform(
                     make_array_view(fe_data.untransformed_shape_grads),
                     mapping_piola_gradient,
@@ -601,7 +711,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        fe_data.sign_change[i] *
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_grads[k][d];
 
                   break;
@@ -621,7 +731,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   // the real cell.
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_grads[k] =
-                      fe_data.shape_grads[i][k];
+                      fe_data.shape_grads[dof_index][k];
 
                   mapping.transform(
                     make_array_view(fe_data.untransformed_shape_grads),
@@ -639,7 +749,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        fe_data.sign_change[i] *
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_grads[k][d];
 
                   break;
@@ -663,7 +773,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
               case mapping_none:
                 {
                   mapping.transform(
-                    make_array_view(fe_data.shape_grad_grads, i),
+                    make_array_view(fe_data.shape_grad_grads, dof_index),
                     mapping_covariant_gradient,
                     mapping_internal,
                     make_array_view(fe_data.transformed_shape_hessians));
@@ -678,6 +788,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_hessians[k][d];
 
                   break;
@@ -686,7 +797,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k] =
-                      fe_data.shape_grad_grads[i][k];
+                      fe_data.shape_grad_grads[dof_index][k];
 
                   mapping.transform(
                     make_array_view(
@@ -720,6 +831,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_hessians[k][d];
 
                   break;
@@ -728,7 +840,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k] =
-                      fe_data.shape_grad_grads[i][k];
+                      fe_data.shape_grad_grads[dof_index][k];
 
                   mapping.transform(
                     make_array_view(
@@ -779,6 +891,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_hessians[k][d];
 
                   break;
@@ -788,7 +901,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k] =
-                      fe_data.shape_grad_grads[i][k];
+                      fe_data.shape_grad_grads[dof_index][k];
 
                   mapping.transform(
                     make_array_view(
@@ -871,7 +984,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        fe_data.sign_change[i] *
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_hessians[k][d];
 
                   break;
@@ -881,7 +994,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k] =
-                      fe_data.shape_grad_grads[i][k];
+                      fe_data.shape_grad_grads[dof_index][k];
 
                   mapping.transform(
                     make_array_view(
@@ -915,7 +1028,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        fe_data.sign_change[i] *
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         fe_data.transformed_shape_hessians[k][d];
 
                   break;
@@ -981,32 +1094,76 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
 
   // TODO: Size assertions
 
-  // Create table with sign changes, due to the special structure of the RT
-  // elements.
-  // TODO: Preliminary hack to demonstrate the overall prinicple!
+  // TODO: The dof_sign_change only affects Nedelec elements and is not the
+  // correct thing on complicated meshes for higher order Nedelec elements.
+  // Something similar to FE_Q should be done to permute dofs and to change the
+  // dof signs. A static way using tables (as done in the RaviartThomas<dim>
+  // class) is preferable.
+  std::fill(fe_data.dof_sign_change.begin(),
+            fe_data.dof_sign_change.end(),
+            1.0);
+  internal::FE_PolyTensor::get_dof_sign_change_nedelec(cell,
+                                                       *this,
+                                                       this->mapping_kind,
+                                                       fe_data.dof_sign_change);
 
-  // Compute eventual sign changes depending
-  // on the neighborhood between two faces.
-  std::fill(fe_data.sign_change.begin(), fe_data.sign_change.end(), 1.0);
+  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2D
+  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1D.
+  // Also nothing in 3D since we take care of it by using the
+  // adjust_quad_dof_sign_for_face_orientation_table.
+  internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
+                                                     *this,
+                                                     this->mapping_kind,
+                                                     fe_data.dof_sign_change);
 
-  internal::FE_PolyTensor::get_face_sign_change_rt(cell,
-                                                   *this,
-                                                   this->mapping_kind,
-                                                   fe_data.sign_change);
+  // What is the first dof_index on a quad?
+  const unsigned int first_quad_index = this->get_first_quad_index();
+  // How many dofs per quad and how many quad dofs do we have at all?
+  const unsigned int n_dofs_per_quad = this->n_dofs_per_quad();
+  const unsigned int n_quad_dofs =
+    n_dofs_per_quad * GeometryInfo<dim>::faces_per_cell;
 
-  internal::FE_PolyTensor::get_face_sign_change_nedelec(cell,
-                                                        *this,
-                                                        this->mapping_kind,
-                                                        fe_data.sign_change);
-
-  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+  for (unsigned int dof_index = 0; dof_index < this->n_dofs_per_cell();
+       ++dof_index)
     {
-      const MappingKind mapping_kind = get_mapping_kind(i);
+      /*
+       * This assumes that the dofs are ordered by first vertices, lines, quads
+       * and volume dofs. Note that in 2D this always gives false.
+       */
+      const bool is_quad_dof =
+        (dim == 2 ? false :
+                    (first_quad_index <= dof_index) &&
+                      (dof_index < first_quad_index + n_quad_dofs));
+
+      unsigned int i        = dof_index;
+      double       dof_sign = 1.0;
+      if (is_quad_dof)
+        {
+          /*
+           * Find the face belonging to this dof_index. This is integer
+           * division.
+           */
+          unsigned int face_index_from_dof_index =
+            (dof_index - first_quad_index) / (n_dofs_per_quad);
+
+          unsigned int local_quad_dof_index = dof_index % n_dofs_per_quad;
+
+          // Correct the dof_sign if necessary
+          if (adjust_quad_dof_sign_for_face_orientation(
+                local_quad_dof_index,
+                face_index_from_dof_index,
+                cell->face_orientation(face_index_from_dof_index),
+                cell->face_flip(face_index_from_dof_index),
+                cell->face_rotation(face_index_from_dof_index)))
+            dof_sign = -1.0;
+        }
+
+      const MappingKind mapping_kind = get_mapping_kind(dof_index);
 
       const unsigned int first =
-        output_data.shape_function_to_row_table[i * this->n_components() +
-                                                this->get_nonzero_components(i)
-                                                  .first_selected_component()];
+        output_data.shape_function_to_row_table
+          [dof_index * this->n_components() +
+           this->get_nonzero_components(dof_index).first_selected_component()];
 
       if (fe_data.update_each & update_values)
         {
@@ -1040,6 +1197,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_values[k][d];
 
                   break;
@@ -1062,7 +1220,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        fe_data.sign_change[i] * transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_values[k][d];
                   break;
                 }
 
@@ -1084,7 +1243,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        fe_data.sign_change[i] * transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_values[k][d];
 
                   break;
                 }
@@ -1112,6 +1272,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_grads[k][d];
                   break;
                 }
@@ -1138,6 +1299,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_grads[k][d];
                   break;
                 }
@@ -1169,6 +1331,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_grads[k][d];
 
                   break;
@@ -1205,7 +1368,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        fe_data.sign_change[i] * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -1248,7 +1412,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        fe_data.sign_change[i] * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -1287,6 +1452,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_hessians[k][d];
 
                   break;
@@ -1335,6 +1501,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_hessians[k][d];
 
                   break;
@@ -1400,6 +1567,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_hessians[k][d];
 
                   break;
@@ -1497,7 +1665,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        fe_data.sign_change[i] *
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_hessians[k][d];
 
                   break;
@@ -1547,7 +1715,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        fe_data.sign_change[i] *
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_hessians[k][d];
 
                   break;
@@ -1608,36 +1776,78 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                                                 n_q_points,
                                                 cell->subface_case(face_no));
 
-  //   Assert(mapping_kind == independent
-  //       || ( mapping_kind == independent_on_cartesian
-  //            && dynamic_cast<const MappingCartesian<dim>*>(&mapping) != 0),
-  //       ExcNotImplemented());
   // TODO: Size assertions
 
-  // TODO: Sign change for the face DoFs!
+  // TODO: The dof_sign_change only affects Nedelec elements and is not the
+  // correct thing on complicated meshes for higher order Nedelec elements.
+  // Something similar to FE_Q should be done to permute dofs and to change the
+  // dof signs. A static way using tables (as done in the RaviartThomas<dim>
+  // class) is preferable.
+  std::fill(fe_data.dof_sign_change.begin(),
+            fe_data.dof_sign_change.end(),
+            1.0);
+  internal::FE_PolyTensor::get_dof_sign_change_nedelec(cell,
+                                                       *this,
+                                                       this->mapping_kind,
+                                                       fe_data.dof_sign_change);
 
-  // Compute eventual sign changes depending
-  // on the neighborhood between two faces.
-  std::fill(fe_data.sign_change.begin(), fe_data.sign_change.end(), 1.0);
+  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2D
+  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1D.
+  // Also nothing in 3D since we take care of it by using the
+  // adjust_quad_dof_sign_for_face_orientation_table.
+  internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
+                                                     *this,
+                                                     this->mapping_kind,
+                                                     fe_data.dof_sign_change);
 
-  internal::FE_PolyTensor::get_face_sign_change_rt(cell,
-                                                   *this,
-                                                   this->mapping_kind,
-                                                   fe_data.sign_change);
+  // What is the first dof_index on a quad?
+  const unsigned int first_quad_index = this->get_first_quad_index();
+  // How many dofs per quad and how many quad dofs do we have at all?
+  const unsigned int n_dofs_per_quad = this->n_dofs_per_quad();
+  const unsigned int n_quad_dofs =
+    n_dofs_per_quad * GeometryInfo<dim>::faces_per_cell;
 
-  internal::FE_PolyTensor::get_face_sign_change_nedelec(cell,
-                                                        *this,
-                                                        this->mapping_kind,
-                                                        fe_data.sign_change);
-
-  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+  for (unsigned int dof_index = 0; dof_index < this->n_dofs_per_cell();
+       ++dof_index)
     {
-      const MappingKind mapping_kind = get_mapping_kind(i);
+      /*
+       * This assumes that the dofs are ordered by first vertices, lines, quads
+       * and volume dofs. Note that in 2D this always gives false.
+       */
+      const bool is_quad_dof =
+        (dim == 2 ? false :
+                    (first_quad_index <= dof_index) &&
+                      (dof_index < first_quad_index + n_quad_dofs));
+
+      unsigned int i        = dof_index;
+      double       dof_sign = 1.0;
+      if (is_quad_dof)
+        {
+          /*
+           * Find the face belonging to this dof_index. This is integer
+           * division.
+           */
+          unsigned int face_index_from_dof_index =
+            (dof_index - first_quad_index) / (n_dofs_per_quad);
+
+          unsigned int local_quad_dof_index = dof_index % n_dofs_per_quad;
+
+          // Correct the dof_sign if necessary
+          if (adjust_quad_dof_sign_for_face_orientation(
+                local_quad_dof_index,
+                face_index_from_dof_index,
+                cell->face_orientation(face_index_from_dof_index),
+                cell->face_flip(face_index_from_dof_index),
+                cell->face_rotation(face_index_from_dof_index)))
+            dof_sign = -1.0;
+        }
+
+      const MappingKind mapping_kind = get_mapping_kind(dof_index);
 
       const unsigned int first =
-        output_data.shape_function_to_row_table[i * this->n_components() +
-                                                this->get_nonzero_components(i)
-                                                  .first_selected_component()];
+        output_data.shape_function_to_row_table
+          [dof_index * this->n_components() +
+           this->get_nonzero_components(dof_index).first_selected_component()];
 
       if (fe_data.update_each & update_values)
         {
@@ -1671,6 +1881,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_values[k][d];
 
                   break;
@@ -1695,7 +1906,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        fe_data.sign_change[i] * transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_values[k][d];
                   break;
                 }
 
@@ -1718,7 +1930,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        fe_data.sign_change[i] * transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_values[k][d];
 
                   break;
                 }
@@ -1746,6 +1959,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_grads[k][d];
                   break;
                 }
@@ -1768,6 +1982,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_grads[k][d];
 
                   break;
@@ -1797,6 +2012,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_grads[k][d];
 
                   break;
@@ -1830,7 +2046,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        fe_data.sign_change[i] * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -1868,7 +2085,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        fe_data.sign_change[i] * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -1907,6 +2125,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_hessians[k][d];
 
                   break;
@@ -1955,6 +2174,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_hessians[k][d];
 
                   break;
@@ -2020,6 +2240,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_hessians[k][d];
 
                   break;
@@ -2116,7 +2337,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        fe_data.sign_change[i] *
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_hessians[k][d];
 
                   break;
@@ -2166,7 +2387,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        fe_data.sign_change[i] *
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
                         transformed_shape_hessians[k][d];
 
                   break;

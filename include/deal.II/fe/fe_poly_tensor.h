@@ -225,6 +225,122 @@ protected:
   single_mapping_kind() const;
 
   /**
+   * The vector of tables
+   * <code>adjust_quad_dof_index_for_face_orientation_table</code> contains
+   * offsets for local face dofs and is being filled with zeros in fe.cc. We
+   * need to fill it with the correct values in case of non-standard, flipped
+   * (rotated by +180 degrees) or rotated (rotated by +90 degrees) faces. These
+   * are given in the form three flags (face_orientation, face_flip,
+   * face_rotation), see the documentation in GeometryInfo<dim> and
+   * this @ref GlossFaceOrientation "glossary entry on face orientation".
+   *
+   * <h3>Example: Raviart-Thomas Elements of order 2 (tensor polynomial degree
+   * 4)</h3>
+   *
+   * The dofs on a face are connected to a <code>n</code>-by-<code>n</code>
+   * matrix where here <code>n=3</code>. In our example we can imagine the
+   * following dofs on a quad (face):
+   *
+   * @verbatim
+   *  ___________
+   * |           |
+   * |  6  7  8  |
+   * |           |
+   * |  3  4  5  |
+   * |           |
+   * |  0  1  2  |
+   * |___________|
+   *@endverbatim
+   *
+   * We have for a local <code>face_dof_index=i+n*j</code> with index
+   * <code>i</code> in x-direction and index <code>j</code> in y-direction
+   * running from 0 to <code>n-1</code>.  To extract <code>i</code> and
+   * <code>j</code> we can use <code>i = face_dof_index % n</code> and <code>j =
+   * dof_index / n</code> (integer division). The indices <code>i</code> and
+   * <code>j</code> can then be used to compute the offset.
+   *
+   * Example: if the switches are <code>(true | true | true)</code> that means we flip the
+   * face first by + 90 degree(counterclockwise) then by another +180
+   * degrees but we do not flip it since the face has standard
+   * orientation. The flip axis is the diagonal from the lower left to the upper
+   * right corner of the face. With these flags the configuration above becomes:
+   *
+   *@verbatim
+   *  ___________
+   * |           |
+   * |  8  7  6  |
+   * |           |
+   * |  5  4  3  |
+   * |           |
+   * |  2  1  0  |
+   * |___________|
+   * @endverbatim
+   *
+   * Note that the necessity of a permutation depends on the combination of the
+   * three flags.
+   *
+   * There is also a pattern for the sign change of the permuted shape functions
+   * that depends on the combination of the switches. In the above example it
+   * would be
+   *
+   * @verbatim
+   * ___________
+   * |           |
+   * |  +  +  -  |
+   * |           |
+   * |  +  +  -  |
+   * |           |
+   * |  +  +  -  |
+   * |___________|
+   * @endverbatim
+   *
+   * @note This function is not a pure virtual function but still must be implemented
+   * in finite elements classes derived from FE_PolyTensor since the permutation
+   * pattern and the pattern of sign changes depends on how the finite element
+   * distributes the local dofs on the faces. Each (vector) finite element class
+   * that does not have a robust implementation in Deal.II throws an exception
+   * if there is a cell in the triangulation that has non-standard, flipped or
+   * rotated faces.
+   */
+  virtual void
+  initialize_quad_dof_index_permutation_and_sign_change();
+
+  /**
+   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * (quads) have to be permuted in order to be combined with the correct
+   * shape functions and additionally can change the sign. Given a local dof @p index on a quad, return the
+   * sign of the permuted shape function, if the face has non-standard
+   * face_orientation, face_flip or face_rotation. In 2D and 1D there is no need
+   * for permutation and consequently it does nothing in this case.
+   *
+   * The permutation itself is returned by
+   * adjust_quad_dof_index_for_face_orientation implemented in the interface
+   * class FiniteElement<dim>.
+   */
+  bool
+  adjust_quad_dof_sign_for_face_orientation(const unsigned int index,
+                                            const unsigned int face_no,
+                                            const bool         face_orientation,
+                                            const bool         face_flip,
+                                            const bool face_rotation) const;
+
+  /**
+   * For faces with non-standard face_orientation in 3D, the dofs on faces
+   * (quads) have to be permuted in order to be combined with the correct
+   * shape functions. For elements with shape that have an orientation relative
+   * to faces finding the permutations is not enough. We possibly need to change
+   * the sign of the shape function on faces depending on the combination of the
+   * three bool flags face_orientation, face_flip and face_rotation.
+   *
+   * The constructor of this class fills this table with ones, i.e.,
+   * no sign change at all. Derived finite element classes have to
+   * fill this Table with the correct values, see the documentation in
+   * GeometryInfo<dim> and
+   * this @ref GlossFaceOrientation "glossary entry on face orientation".
+   */
+  std::vector<Table<2, bool>> adjust_quad_dof_sign_for_face_orientation_table;
+
+  /**
    * Returns MappingKind @p i for the finite element.
    */
   MappingKind
@@ -262,7 +378,7 @@ protected:
     std::vector<Tensor<5, dim>> fourth_derivatives(0);
 
     if (update_flags & (update_values | update_gradients | update_hessians))
-      data.sign_change.resize(this->n_dofs_per_cell());
+      data.dof_sign_change.resize(this->dofs_per_cell);
 
     // initialize fields only if really
     // necessary. otherwise, don't
@@ -460,7 +576,7 @@ protected:
     /**
      * Scratch arrays for intermediate computations
      */
-    mutable std::vector<double>              sign_change;
+    mutable std::vector<double>              dof_sign_change;
     mutable std::vector<Tensor<1, spacedim>> transformed_shape_values;
     // for shape_gradient computations
     mutable std::vector<Tensor<2, spacedim>> transformed_shape_grads;

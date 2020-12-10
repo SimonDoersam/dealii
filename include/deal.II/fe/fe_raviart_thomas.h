@@ -218,6 +218,12 @@ private:
    */
   Table<3, double> interior_weights;
 
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   */
+  virtual void
+  initialize_quad_dof_index_permutation_and_sign_change() override;
+
   // Allow access from other dimensions.
   template <int dim1>
   friend class FE_RaviartThomas;
@@ -346,6 +352,7 @@ private:
   virtual bool
   has_support_on_face(const unsigned int shape_index,
                       const unsigned int face_index) const override;
+
   /**
    * Initialize the FiniteElement<dim>::generalized_support_points and
    * FiniteElement<dim>::generalized_face_support_points fields. Called from
@@ -357,6 +364,12 @@ private:
    */
   void
   initialize_support_points(const unsigned int rt_degree);
+
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   */
+  virtual void
+  initialize_quad_dof_index_permutation_and_sign_change() override;
 };
 
 

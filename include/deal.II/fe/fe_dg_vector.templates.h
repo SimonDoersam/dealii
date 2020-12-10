@@ -98,6 +98,23 @@ FE_DGVector<PolynomialType, dim, spacedim>::has_support_on_face(
 }
 
 
+template <class PolynomialType, int dim, int spacedim>
+void
+FE_DGVector<PolynomialType, dim, spacedim>::
+  initialize_quad_dof_index_permutation_and_sign_change()
+{
+  AssertThrow(
+    false,
+    ExcMessage(
+      "This method must be implemented in any class derived "
+      "form FE_PolyTensor that is final. This method is specific to the (vector) "
+      "finite element used and determines how face_dofs are "
+      "permuted and how they change their sign on cells that "
+      "have non-standard faces, i.e., they can have faces with "
+      "non-standard orientation or be rotated. For an example "
+      "implementation see fe_q_base.cc or fe_raviart_thomas.cc."));
+}
+
 
 template <class PolynomialType, int dim, int spacedim>
 std::size_t
