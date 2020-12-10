@@ -1,0 +1,918 @@
+
+DEAL::Testing 3D case:
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(0)   elements of (polynomial) degree   1
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(0)   elements of (polynomial) degree   1
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 0 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(0)   elements of (polynomial) degree   1
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 1 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(0)   elements of (polynomial) degree   1
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 1 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(0)   elements of (polynomial) degree   1
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(0)   elements of (polynomial) degree   1
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(0)   elements of (polynomial) degree   1
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 1 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(0)   elements of (polynomial) degree   1
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 6
+DEAL::   n_dofs_per_face      : 1
+DEAL::   n_dofs_per_quad      : 1
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 1 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::****************
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(1)   elements of (polynomial) degree   2
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::   1 ---> 2   sign change = 1
+DEAL::   2 ---> 1   sign change = 1
+DEAL::   3 ---> 3   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(1)   elements of (polynomial) degree   2
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 0 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::   1 ---> 1   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(1)   elements of (polynomial) degree   2
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 1 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::   1 ---> 2   sign change = 0
+DEAL::   2 ---> 1   sign change = 0
+DEAL::   3 ---> 3   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(1)   elements of (polynomial) degree   2
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 1 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::   2 ---> 2   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(1)   elements of (polynomial) degree   2
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(1)   elements of (polynomial) degree   2
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::   1 ---> 2   sign change = 0
+DEAL::   2 ---> 1   sign change = 1
+DEAL::   3 ---> 3   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(1)   elements of (polynomial) degree   2
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 1 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::   1 ---> 1   sign change = 1
+DEAL::   2 ---> 2   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(1)   elements of (polynomial) degree   2
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 36
+DEAL::   n_dofs_per_face      : 4
+DEAL::   n_dofs_per_quad      : 4
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 1 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::   1 ---> 2   sign change = 1
+DEAL::   2 ---> 1   sign change = 0
+DEAL::   3 ---> 3   sign change = 1
+DEAL::****************
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(2)   elements of (polynomial) degree   3
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::   1 ---> 3   sign change = 1
+DEAL::   2 ---> 6   sign change = 1
+DEAL::   3 ---> 1   sign change = 1
+DEAL::   4 ---> 4   sign change = 1
+DEAL::   5 ---> 7   sign change = 1
+DEAL::   6 ---> 2   sign change = 1
+DEAL::   7 ---> 5   sign change = 1
+DEAL::   8 ---> 8   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(2)   elements of (polynomial) degree   3
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 0 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::   1 ---> 1   sign change = 1
+DEAL::   2 ---> 2   sign change = 1
+DEAL::   6 ---> 6   sign change = 1
+DEAL::   7 ---> 7   sign change = 1
+DEAL::   8 ---> 8   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(2)   elements of (polynomial) degree   3
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 1 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::   1 ---> 3   sign change = 0
+DEAL::   2 ---> 6   sign change = 1
+DEAL::   3 ---> 1   sign change = 0
+DEAL::   4 ---> 4   sign change = 1
+DEAL::   5 ---> 7   sign change = 0
+DEAL::   6 ---> 2   sign change = 1
+DEAL::   7 ---> 5   sign change = 0
+DEAL::   8 ---> 8   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(2)   elements of (polynomial) degree   3
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 0 | 1 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::   0 ---> 0   sign change = 1
+DEAL::   2 ---> 2   sign change = 1
+DEAL::   3 ---> 3   sign change = 1
+DEAL::   5 ---> 5   sign change = 1
+DEAL::   6 ---> 6   sign change = 1
+DEAL::   8 ---> 8   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(2)   elements of (polynomial) degree   3
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(2)   elements of (polynomial) degree   3
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::   1 ---> 3   sign change = 0
+DEAL::   2 ---> 6   sign change = 0
+DEAL::   3 ---> 1   sign change = 1
+DEAL::   4 ---> 4   sign change = 1
+DEAL::   5 ---> 7   sign change = 1
+DEAL::   6 ---> 2   sign change = 0
+DEAL::   7 ---> 5   sign change = 0
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(2)   elements of (polynomial) degree   3
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 1 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  0  1  1  1  0  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::   1 ---> 1   sign change = 1
+DEAL::   3 ---> 3   sign change = 1
+DEAL::   5 ---> 5   sign change = 1
+DEAL::   7 ---> 7   sign change = 1
+DEAL::*********************************************************
+DEAL::Testing shape function permuation for   FE_RaviartThomas<3>(2)   elements of (polynomial) degree   3
+DEAL::
+DEAL::Element Info:  
+DEAL::   n_dofs_per_cell      : 108
+DEAL::   n_dofs_per_face      : 9
+DEAL::   n_dofs_per_quad      : 9
+DEAL::   n_dofs_per_line      : 0
+DEAL::   n_dofs_per_vertex    : 0
+DEAL::   first_line_index     : 0
+DEAL::   first_quad_index     : 0
+DEAL::   first_face_line_index: 0
+DEAL::   first_face_quad_index: 0
+DEAL::
+DEAL::
+DEAL::CellId = 0_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 0 | 0 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  1  1  1  1  }
+DEAL::
+DEAL::CellId = 1_0:
+DEAL::   {index -> face_orientation | face_flip | face_rotation}: 
+DEAL::      {0 -> 1 | 1 | 1 } 
+DEAL::      {1 -> 1 | 0 | 0 } 
+DEAL::      {2 -> 1 | 0 | 0 } 
+DEAL::      {3 -> 1 | 0 | 0 } 
+DEAL::      {4 -> 1 | 0 | 0 } 
+DEAL::      {5 -> 1 | 0 | 0 } 
+DEAL::   line orientation: {  1  1  1  1  1  1  1  1  0  1  0  1  }
+DEAL::
+DEAL::   1 ---> 3   sign change = 1
+DEAL::   2 ---> 6   sign change = 0
+DEAL::   3 ---> 1   sign change = 0
+DEAL::   4 ---> 4   sign change = 1
+DEAL::   5 ---> 7   sign change = 0
+DEAL::   6 ---> 2   sign change = 0
+DEAL::   7 ---> 5   sign change = 1
+DEAL::****************
+DEAL::Testing 3D case done.

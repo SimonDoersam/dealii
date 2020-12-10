@@ -769,6 +769,32 @@ namespace GridGenerator
                       const double        radius = 1.);
 
   /**
+   * Generate a mesh consisting of the unit cube joined with a copy shifted by
+   * $s = (1,0,0)$. Depending on the flags passed either the right or the
+   * left cube (when looking at the positively oriented (x,z)-plane) contains a
+   * face that is either not in standard orientation and/or is rotated by either
+   * $\pi/2$, $\pi$ or $3/2\pi$.
+   *
+   * This mesh is not overly useful from the practical point of view. For
+   * debugging purposes it can be used to check for orientation issues for
+   * tensor valued finite elements.
+   *
+   * @tparam dim
+   * @param[out] triangulation
+   * @param[in] face_orientation
+   * @param[in] face_flip
+   * @param[in] face_rotation
+   * @param[in] manipulate_left_cube
+   */
+  template <int dim>
+  void
+  orientation_test_mesh(Triangulation<dim> &tria,
+                        const bool          face_orientation,
+                        const bool          face_flip,
+                        const bool          face_rotation,
+                        const bool          manipulate_left_cube);
+
+  /**
    * Creates a hyper sphere, i.e., a surface of a ball in @p spacedim
    * dimensions. This function only exists for dim+1=spacedim in 2 and 3 space
    * dimensions. (To create a mesh of a ball, use GridGenerator::hyper_ball().)
@@ -793,7 +819,6 @@ namespace GridGenerator
    * @pre The triangulation passed as argument needs to be empty when calling
    * this function.
    */
-
   template <int spacedim>
   void hyper_sphere(Triangulation<spacedim - 1, spacedim> &tria,
                     const Point<spacedim> &center = Point<spacedim>(),

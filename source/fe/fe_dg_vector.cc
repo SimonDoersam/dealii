@@ -29,7 +29,27 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim>
 FE_DGNedelec<dim, spacedim>::FE_DGNedelec(const unsigned int p)
   : FE_DGVector<PolynomialsNedelec<dim>, dim, spacedim>(p, {mapping_nedelec})
-{}
+{
+  // We need to initialize the dof permuation table and the one for the sign
+  // change.
+  initialize_quad_dof_index_permutation_and_sign_change();
+
+  /*
+   * Do not throw an exception on cells with non-standard faces. DG elements
+   * should have no face dofs at all.
+   */
+  this->throw_exception_on_occurrance_of_nonstandard_faces = false;
+}
+
+
+template <int dim, int spacedim>
+void
+FE_DGNedelec<dim,
+             spacedim>::initialize_quad_dof_index_permutation_and_sign_change()
+{
+  // nothing to do since there should be no face dofs
+  return;
+}
 
 
 template <int dim, int spacedim>
@@ -54,7 +74,27 @@ FE_DGRaviartThomas<dim, spacedim>::FE_DGRaviartThomas(const unsigned int p)
   : FE_DGVector<PolynomialsRaviartThomas<dim>, dim, spacedim>(
       p,
       {mapping_raviart_thomas})
-{}
+{
+  // We need to initialize the dof permuation table and the one for the sign
+  // change.
+  initialize_quad_dof_index_permutation_and_sign_change();
+
+  /*
+   * Do not throw an exception on cells with non-standard faces. DG elements
+   * should have no face dofs at all.
+   */
+  this->throw_exception_on_occurrance_of_nonstandard_faces = false;
+}
+
+
+template <int dim, int spacedim>
+void
+FE_DGRaviartThomas<dim, spacedim>::
+  initialize_quad_dof_index_permutation_and_sign_change()
+{
+  // nothing to do since there should be no face dofs
+  return;
+}
 
 
 template <int dim, int spacedim>
@@ -79,7 +119,26 @@ FE_DGRaviartThomas<dim, spacedim>::get_name() const
 template <int dim, int spacedim>
 FE_DGBDM<dim, spacedim>::FE_DGBDM(const unsigned int p)
   : FE_DGVector<PolynomialsBDM<dim>, dim, spacedim>(p, {mapping_bdm})
-{}
+{
+  // We need to initialize the dof permuation table and the one for the sign
+  // change.
+  initialize_quad_dof_index_permutation_and_sign_change();
+
+  /*
+   * Do not throw an exception on cells with non-standard faces. DG elements
+   * should have no face dofs at all.
+   */
+  this->throw_exception_on_occurrance_of_nonstandard_faces = false;
+}
+
+
+template <int dim, int spacedim>
+void
+FE_DGBDM<dim, spacedim>::initialize_quad_dof_index_permutation_and_sign_change()
+{
+  // nothing to do since there should be no face dofs
+  return;
+}
 
 
 template <int dim, int spacedim>

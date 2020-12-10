@@ -127,6 +127,16 @@ private:
     std::vector<std::vector<Tensor<2, dim>>> shape_gradients;
   };
   Table<3, double> interior_weights;
+
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   *
+   * @note This function is not fully filled with the correct implementation
+   * yet. It needs to be consistently implemented in a future release to work
+   * on meshes that contain cells with flipped faces.
+   */
+  virtual void
+  initialize_quad_dof_index_permutation_and_sign_change() override;
 };
 
 
@@ -157,6 +167,17 @@ public:
    */
   virtual std::string
   get_name() const override;
+
+private:
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   *
+   * @note This function is not fully filled with the correct implementation
+   * yet. It needs to be consistently implemented in a future release to work
+   * on meshes that contain cells with flipped faces.
+   */
+  virtual void
+  initialize_quad_dof_index_permutation_and_sign_change() override;
 };
 
 
@@ -188,6 +209,17 @@ public:
    */
   virtual std::string
   get_name() const override;
+
+private:
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   *
+   * @note This function is not fully filled with the correct implementation
+   * yet. It needs to be consistently implemented in a future release to work
+   * on meshes that contain cells with flipped faces.
+   */
+  virtual void
+  initialize_quad_dof_index_permutation_and_sign_change() override;
 };
 
 
@@ -218,6 +250,17 @@ public:
    */
   virtual std::string
   get_name() const override;
+
+private:
+  /**
+   * Initialize the permutation pattern and the pattern of sign change.
+   *
+   * @note This function is not fully filled with the correct implementation
+   * yet. It needs to be consistently implemented in a future release to work
+   * on meshes that contain cells with flipped faces.
+   */
+  virtual void
+  initialize_quad_dof_index_permutation_and_sign_change() override;
 };
 
 
