@@ -780,11 +780,15 @@ namespace GridGenerator
    * tensor valued finite elements.
    *
    * @tparam dim
-   * @param[out] triangulation
-   * @param[in] face_orientation
-   * @param[in] face_flip
-   * @param[in] face_rotation
-   * @param[in] manipulate_left_cube
+   * @param[out] tria input triangulation
+   * @param[in] face_orientation <code>true</code> if the face is the not in
+   * standard orientation
+   * @param[in] face_flip <code>true</code> if the face is rotated by +180
+   * degrees
+   * @param[in] face_rotation <code>true</code> if the face is rotated
+   * (additionally) by +90 degrees
+   * @param[in] manipulate_left_cube <code>true</code> if the left cube is
+   * re-ordered
    */
   template <int dim>
   void
