@@ -81,6 +81,8 @@ template <int dim, int spacedim>
 FE_PolyTensor<dim, spacedim>::FE_PolyTensor(const FE_PolyTensor &fe)
   : FiniteElement<dim, spacedim>(fe)
   , mapping_kind(fe.mapping_kind)
+  , throw_exception_on_occurrance_of_nonstandard_faces(
+      fe.throw_exception_on_occurrance_of_nonstandard_faces)
   , adjust_quad_dof_sign_for_face_orientation_table(
       fe.adjust_quad_dof_sign_for_face_orientation_table)
   , poly_space(fe.poly_space->clone())
@@ -373,10 +375,10 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
            * Throw if the face is not in standard orientation and the
            * throw_exception_on_occurrance_of_nonstandard_faces flag is set.
            */
-          Assert(!(cell->face_orientation(face_index_from_dof_index) &&
-                   !cell->face_flip(face_index_from_dof_index) &&
-                   !cell->face_rotation(face_index_from_dof_index)) &&
-                   throw_exception_on_occurrance_of_nonstandard_faces,
+          Assert(!(!((4 * cell->face_orientation(face_index_from_dof_index) +
+                      2 * cell->face_flip(face_index_from_dof_index) +
+                      cell->face_rotation(face_index_from_dof_index)) == 4) &&
+                   throw_exception_on_occurrance_of_nonstandard_faces),
                  ExcMessage(
                    "This mesh contains a cell with a face that is "
                    "not in standard orientation or rotated. Computational "
@@ -982,10 +984,10 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
            * Throw if the face is not in standard orientation and the
            * throw_exception_on_occurrance_of_nonstandard_faces flag is set.
            */
-          Assert(!(cell->face_orientation(face_index_from_dof_index) &&
-                   !cell->face_flip(face_index_from_dof_index) &&
-                   !cell->face_rotation(face_index_from_dof_index)) &&
-                   throw_exception_on_occurrance_of_nonstandard_faces,
+          Assert(!(!((4 * cell->face_orientation(face_index_from_dof_index) +
+                      2 * cell->face_flip(face_index_from_dof_index) +
+                      cell->face_rotation(face_index_from_dof_index)) == 4) &&
+                   throw_exception_on_occurrance_of_nonstandard_faces),
                  ExcMessage(
                    "This mesh contains a cell with a face that is "
                    "not in standard orientation or rotated. Computational "
@@ -1645,10 +1647,10 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
            * Throw if the face is not in standard orientation and the
            * throw_exception_on_occurrance_of_nonstandard_faces flag is set.
            */
-          Assert(!(cell->face_orientation(face_index_from_dof_index) &&
-                   !cell->face_flip(face_index_from_dof_index) &&
-                   !cell->face_rotation(face_index_from_dof_index)) &&
-                   throw_exception_on_occurrance_of_nonstandard_faces,
+          Assert(!(!((4 * cell->face_orientation(face_index_from_dof_index) +
+                      2 * cell->face_flip(face_index_from_dof_index) +
+                      cell->face_rotation(face_index_from_dof_index)) == 4) &&
+                   throw_exception_on_occurrance_of_nonstandard_faces),
                  ExcMessage(
                    "This mesh contains a cell with a face that is "
                    "not in standard orientation or rotated. Computational "
