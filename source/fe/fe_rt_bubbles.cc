@@ -110,11 +110,6 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
   // We need to initialize the dof permuation table and the one for the sign
   // change.
   initialize_quad_dof_index_permutation_and_sign_change();
-
-  /*
-   * Throw an exception on cells with non-standard faces
-   */
-  this->throw_exception_on_occurrance_of_nonstandard_faces = true;
 }
 
 

@@ -113,11 +113,6 @@ FE_RaviartThomas<dim>::FE_RaviartThomas(const unsigned int deg)
   // We need to initialize the dof permuation table and the one for the sign
   // change.
   initialize_quad_dof_index_permutation_and_sign_change();
-
-  /*
-   * Do not throw an exception on cells with non-standard faces
-   */
-  this->throw_exception_on_occurrance_of_nonstandard_faces = false;
 }
 
 
@@ -643,12 +638,10 @@ FE_RaviartThomas<dim>::has_support_on_face(const unsigned int shape_index,
   // is always safe to return true.
   switch (this->degree)
     {
-      case 1:
-        {
+        case 1: {
           switch (dim)
             {
-              case 2:
-                {
+                case 2: {
                   // only on the one
                   // non-adjacent face
                   // are the values

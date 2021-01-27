@@ -306,14 +306,6 @@ protected:
   initialize_quad_dof_index_permutation_and_sign_change();
 
   /**
-   * Must be set in a derived class, otherwise the standard is false. If this
-   * flag is true for a finite element derived from FE_PolyTensor an exception
-   * will be thrown on meshes that have cell with faces in non-standard
-   * orientation.
-   */
-  bool throw_exception_on_occurrance_of_nonstandard_faces;
-
-  /**
    * For faces with non-standard face_orientation in 3D, the dofs on faces
    * (quads) have to be permuted in order to be combined with the correct
    * shape functions and additionally can change the sign. Given a local dof @p index on a quad, return the
@@ -384,6 +376,9 @@ protected:
     std::vector<Tensor<3, dim>> grad_grads(0);
     std::vector<Tensor<4, dim>> third_derivatives(0);
     std::vector<Tensor<5, dim>> fourth_derivatives(0);
+
+    if (update_flags & (update_values | update_gradients | update_hessians))
+      data.line_dof_sign.resize(this->dofs_per_cell);
 
     // initialize fields only if really
     // necessary. otherwise, don't
@@ -579,7 +574,7 @@ protected:
     /**
      * Scratch arrays for intermediate computations
      */
-    mutable std::vector<double>              face_sign_change;
+    mutable std::vector<double>              line_dof_sign;
     mutable std::vector<Tensor<1, spacedim>> transformed_shape_values;
     // for shape_gradient computations
     mutable std::vector<Tensor<2, spacedim>> transformed_shape_grads;

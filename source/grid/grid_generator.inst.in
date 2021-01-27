@@ -223,13 +223,6 @@ for (deal_II_dimension : DIMENSIONS)
                             const double,
                             const unsigned int);
 
-      template void
-      orientation_test_mesh(Triangulation<deal_II_dimension> &tria,
-                            const bool                        face_orientation,
-                            const bool                        face_flip,
-                            const bool                        face_rotation,
-                            const bool manipulate_left_cube);
-
 #if deal_II_dimension >= 2
       template void
       hyper_ball_balanced<deal_II_dimension>(Triangulation<deal_II_dimension> &,
