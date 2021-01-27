@@ -43,7 +43,6 @@ FE_PolyTensor<dim, spacedim>::FE_PolyTensor(
                                  restriction_is_additive_flags,
                                  nonzero_components)
   , mapping_kind({MappingKind::mapping_none})
-  , throw_exception_on_occurrance_of_nonstandard_faces(false)
   , poly_space(polynomials.clone())
 {
   cached_point(0) = -1;
@@ -81,8 +80,6 @@ template <int dim, int spacedim>
 FE_PolyTensor<dim, spacedim>::FE_PolyTensor(const FE_PolyTensor &fe)
   : FiniteElement<dim, spacedim>(fe)
   , mapping_kind(fe.mapping_kind)
-  , throw_exception_on_occurrance_of_nonstandard_faces(
-      fe.throw_exception_on_occurrance_of_nonstandard_faces)
   , adjust_quad_dof_sign_for_face_orientation_table(
       fe.adjust_quad_dof_sign_for_face_orientation_table)
   , poly_space(fe.poly_space->clone())
@@ -371,20 +368,6 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
           unsigned int face_index_from_dof_index =
             (dof_index - first_quad_index) / (n_dofs_per_quad);
 
-          /*
-           * Throw if the face is not in standard orientation and the
-           * throw_exception_on_occurrance_of_nonstandard_faces flag is set.
-           */
-          Assert(!(!((4 * cell->face_orientation(face_index_from_dof_index) +
-                      2 * cell->face_flip(face_index_from_dof_index) +
-                      cell->face_rotation(face_index_from_dof_index)) == 4) &&
-                   throw_exception_on_occurrance_of_nonstandard_faces),
-                 ExcMessage(
-                   "This mesh contains a cell with a face that is "
-                   "not in standard orientation or rotated. Computational "
-                   "results with this finite element will be meaningless if "
-                   "they can be obtained at all."));
-
           unsigned int local_quad_dof_index = dof_index % n_dofs_per_quad;
 
           // Correct the dof_sign if necessary
@@ -418,8 +401,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         {
           switch (mapping_kind)
             {
-              case mapping_none:
-                {
+                case mapping_none: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
@@ -428,8 +410,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 }
 
               case mapping_covariant:
-              case mapping_contravariant:
-                {
+                case mapping_contravariant: {
                   mapping.transform(
                     make_array_view(fe_data.shape_values, dof_index),
                     mapping_kind,
@@ -445,8 +426,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 }
 
               case mapping_raviart_thomas:
-              case mapping_piola:
-                {
+                case mapping_piola: {
                   mapping.transform(
                     make_array_view(fe_data.shape_values, dof_index),
                     mapping_piola,
@@ -459,8 +439,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   break;
                 }
 
-              case mapping_nedelec:
-                {
+                case mapping_nedelec: {
                   mapping.transform(
                     make_array_view(fe_data.shape_values, dof_index),
                     mapping_covariant,
@@ -490,8 +469,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         {
           switch (mapping_kind)
             {
-              case mapping_none:
-                {
+                case mapping_none: {
                   mapping.transform(
                     make_array_view(fe_data.shape_grads, dof_index),
                     mapping_covariant,
@@ -503,8 +481,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                         dof_sign * fe_data.transformed_shape_grads[k][d];
                   break;
                 }
-              case mapping_covariant:
-                {
+                case mapping_covariant: {
                   mapping.transform(
                     make_array_view(fe_data.shape_grads, dof_index),
                     mapping_covariant_gradient,
@@ -525,8 +502,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
 
                   break;
                 }
-              case mapping_contravariant:
-                {
+                case mapping_contravariant: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_grads[k] =
                       fe_data.shape_grads[dof_index][k];
@@ -552,8 +528,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   break;
                 }
               case mapping_raviart_thomas:
-              case mapping_piola:
-                {
+                case mapping_piola: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_grads[k] =
                       fe_data.shape_grads[dof_index][k];
@@ -581,8 +556,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   break;
                 }
 
-              case mapping_nedelec:
-                {
+                case mapping_nedelec: {
                   // treat the gradients of
                   // this particular shape
                   // function at all
@@ -633,8 +607,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         {
           switch (mapping_kind)
             {
-              case mapping_none:
-                {
+                case mapping_none: {
                   mapping.transform(
                     make_array_view(fe_data.shape_grad_grads, dof_index),
                     mapping_covariant_gradient,
@@ -655,8 +628,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
 
                   break;
                 }
-              case mapping_covariant:
-                {
+                case mapping_covariant: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k] =
                       fe_data.shape_grad_grads[dof_index][k];
@@ -697,8 +669,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
 
                   break;
                 }
-              case mapping_contravariant:
-                {
+                case mapping_contravariant: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k] =
                       fe_data.shape_grad_grads[dof_index][k];
@@ -757,8 +728,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   break;
                 }
               case mapping_raviart_thomas:
-              case mapping_piola:
-                {
+                case mapping_piola: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k] =
                       fe_data.shape_grad_grads[dof_index][k];
@@ -849,8 +819,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   break;
                 }
 
-              case mapping_nedelec:
-                {
+                case mapping_nedelec: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k] =
                       fe_data.shape_grad_grads[dof_index][k];
@@ -980,20 +949,6 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
           unsigned int face_index_from_dof_index =
             (dof_index - first_quad_index) / (n_dofs_per_quad);
 
-          /*
-           * Throw if the face is not in standard orientation and the
-           * throw_exception_on_occurrance_of_nonstandard_faces flag is set.
-           */
-          Assert(!(!((4 * cell->face_orientation(face_index_from_dof_index) +
-                      2 * cell->face_flip(face_index_from_dof_index) +
-                      cell->face_rotation(face_index_from_dof_index)) == 4) &&
-                   throw_exception_on_occurrance_of_nonstandard_faces),
-                 ExcMessage(
-                   "This mesh contains a cell with a face that is "
-                   "not in standard orientation or rotated. Computational "
-                   "results with this finite element will be meaningless if "
-                   "they can be obtained at all."));
-
           unsigned int local_quad_dof_index = dof_index % n_dofs_per_quad;
 
           // Correct the dof_sign if necessary
@@ -1017,8 +972,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
         {
           switch (mapping_kind)
             {
-              case mapping_none:
-                {
+                case mapping_none: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
@@ -1027,8 +981,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                 }
 
               case mapping_covariant:
-              case mapping_contravariant:
-                {
+                case mapping_contravariant: {
                   const ArrayView<Tensor<1, spacedim>>
                     transformed_shape_values =
                       make_array_view(fe_data.transformed_shape_values,
@@ -1050,8 +1003,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   break;
                 }
               case mapping_raviart_thomas:
-              case mapping_piola:
-                {
+                case mapping_piola: {
                   const ArrayView<Tensor<1, spacedim>>
                     transformed_shape_values =
                       make_array_view(fe_data.transformed_shape_values,
@@ -1071,8 +1023,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   break;
                 }
 
-              case mapping_nedelec:
-                {
+                case mapping_nedelec: {
                   const ArrayView<Tensor<1, spacedim>>
                     transformed_shape_values =
                       make_array_view(fe_data.transformed_shape_values,
@@ -1103,8 +1054,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
         {
           switch (mapping_kind)
             {
-              case mapping_none:
-                {
+                case mapping_none: {
                   const ArrayView<Tensor<2, spacedim>> transformed_shape_grads =
                     make_array_view(fe_data.transformed_shape_grads,
                                     offset,
@@ -1121,8 +1071,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   break;
                 }
 
-              case mapping_covariant:
-                {
+                case mapping_covariant: {
                   const ArrayView<Tensor<2, spacedim>> transformed_shape_grads =
                     make_array_view(fe_data.transformed_shape_grads,
                                     offset,
@@ -1147,8 +1096,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   break;
                 }
 
-              case mapping_contravariant:
-                {
+                case mapping_contravariant: {
                   const ArrayView<Tensor<2, spacedim>> transformed_shape_grads =
                     make_array_view(fe_data.transformed_shape_grads,
                                     offset,
@@ -1180,8 +1128,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                 }
 
               case mapping_raviart_thomas:
-              case mapping_piola:
-                {
+                case mapping_piola: {
                   const ArrayView<Tensor<2, spacedim>> transformed_shape_grads =
                     make_array_view(fe_data.transformed_shape_grads,
                                     offset,
@@ -1215,8 +1162,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   break;
                 }
 
-              case mapping_nedelec:
-                {
+                case mapping_nedelec: {
                   // treat the gradients of
                   // this particular shape
                   // function at all
@@ -1267,8 +1213,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
         {
           switch (mapping_kind)
             {
-              case mapping_none:
-                {
+                case mapping_none: {
                   const ArrayView<Tensor<3, spacedim>>
                     transformed_shape_hessians =
                       make_array_view(fe_data.transformed_shape_hessians,
@@ -1296,8 +1241,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
 
                   break;
                 }
-              case mapping_covariant:
-                {
+                case mapping_covariant: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k + offset] =
                       fe_data.shape_grad_grads[i][k + offset];
@@ -1345,8 +1289,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   break;
                 }
 
-              case mapping_contravariant:
-                {
+                case mapping_contravariant: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k + offset] =
                       fe_data.shape_grad_grads[i][k + offset];
@@ -1411,8 +1354,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                 }
 
               case mapping_raviart_thomas:
-              case mapping_piola:
-                {
+                case mapping_piola: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k + offset] =
                       fe_data.shape_grad_grads[i][k + offset];
@@ -1507,8 +1449,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   break;
                 }
 
-              case mapping_nedelec:
-                {
+                case mapping_nedelec: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k + offset] =
                       fe_data.shape_grad_grads[i][k + offset];
@@ -1643,20 +1584,6 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
           unsigned int face_index_from_dof_index =
             (dof_index - first_quad_index) / (n_dofs_per_quad);
 
-          /*
-           * Throw if the face is not in standard orientation and the
-           * throw_exception_on_occurrance_of_nonstandard_faces flag is set.
-           */
-          Assert(!(!((4 * cell->face_orientation(face_index_from_dof_index) +
-                      2 * cell->face_flip(face_index_from_dof_index) +
-                      cell->face_rotation(face_index_from_dof_index)) == 4) &&
-                   throw_exception_on_occurrance_of_nonstandard_faces),
-                 ExcMessage(
-                   "This mesh contains a cell with a face that is "
-                   "not in standard orientation or rotated. Computational "
-                   "results with this finite element will be meaningless if "
-                   "they can be obtained at all."));
-
           unsigned int local_quad_dof_index = dof_index % n_dofs_per_quad;
 
           // Correct the dof_sign if necessary
@@ -1680,8 +1607,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
         {
           switch (mapping_kind)
             {
-              case mapping_none:
-                {
+                case mapping_none: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
@@ -1690,8 +1616,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                 }
 
               case mapping_covariant:
-              case mapping_contravariant:
-                {
+                case mapping_contravariant: {
                   const ArrayView<Tensor<1, spacedim>>
                     transformed_shape_values =
                       make_array_view(fe_data.transformed_shape_values,
@@ -1714,8 +1639,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                 }
 
               case mapping_raviart_thomas:
-              case mapping_piola:
-                {
+                case mapping_piola: {
                   const ArrayView<Tensor<1, spacedim>>
                     transformed_shape_values =
                       make_array_view(fe_data.transformed_shape_values,
@@ -1736,8 +1660,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   break;
                 }
 
-              case mapping_nedelec:
-                {
+                case mapping_nedelec: {
                   const ArrayView<Tensor<1, spacedim>>
                     transformed_shape_values =
                       make_array_view(fe_data.transformed_shape_values,
@@ -1773,8 +1696,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                             n_q_points);
           switch (mapping_kind)
             {
-              case mapping_none:
-                {
+                case mapping_none: {
                   mapping.transform(
                     make_array_view(fe_data.shape_grads, i, offset, n_q_points),
                     mapping_covariant,
@@ -1787,8 +1709,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   break;
                 }
 
-              case mapping_covariant:
-                {
+                case mapping_covariant: {
                   mapping.transform(
                     make_array_view(fe_data.shape_grads, i, offset, n_q_points),
                     mapping_covariant_gradient,
@@ -1810,8 +1731,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   break;
                 }
 
-              case mapping_contravariant:
-                {
+                case mapping_contravariant: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_grads[k + offset] =
                       fe_data.shape_grads[i][k + offset];
@@ -1840,8 +1760,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                 }
 
               case mapping_raviart_thomas:
-              case mapping_piola:
-                {
+                case mapping_piola: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_grads[k + offset] =
                       fe_data.shape_grads[i][k + offset];
@@ -1872,8 +1791,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   break;
                 }
 
-              case mapping_nedelec:
-                {
+                case mapping_nedelec: {
                   // this particular shape
                   // function at all
                   // q-points. if Dv is the
@@ -1919,8 +1837,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
         {
           switch (mapping_kind)
             {
-              case mapping_none:
-                {
+                case mapping_none: {
                   const ArrayView<Tensor<3, spacedim>>
                     transformed_shape_hessians =
                       make_array_view(fe_data.transformed_shape_hessians,
@@ -1948,8 +1865,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
 
                   break;
                 }
-              case mapping_covariant:
-                {
+                case mapping_covariant: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k + offset] =
                       fe_data.shape_grad_grads[i][k + offset];
@@ -1997,8 +1913,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   break;
                 }
 
-              case mapping_contravariant:
-                {
+                case mapping_contravariant: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k + offset] =
                       fe_data.shape_grad_grads[i][k + offset];
@@ -2063,8 +1978,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                 }
 
               case mapping_raviart_thomas:
-              case mapping_piola:
-                {
+                case mapping_piola: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k + offset] =
                       fe_data.shape_grad_grads[i][k + offset];
@@ -2158,8 +2072,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   break;
                 }
 
-              case mapping_nedelec:
-                {
+                case mapping_nedelec: {
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     fe_data.untransformed_shape_hessian_tensors[k + offset] =
                       fe_data.shape_grad_grads[i][k + offset];
@@ -2235,8 +2148,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
 
       switch (mapping_kind)
         {
-          case mapping_none:
-            {
+            case mapping_none: {
               if (flags & update_values)
                 out |= update_values;
 
@@ -2251,8 +2163,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
               break;
             }
           case mapping_raviart_thomas:
-          case mapping_piola:
-            {
+            case mapping_piola: {
               if (flags & update_values)
                 out |= update_values | update_piola;
 
@@ -2272,8 +2183,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
             }
 
 
-          case mapping_contravariant:
-            {
+            case mapping_contravariant: {
               if (flags & update_values)
                 out |= update_values | update_piola;
 
@@ -2293,8 +2203,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
             }
 
           case mapping_nedelec:
-          case mapping_covariant:
-            {
+            case mapping_covariant: {
               if (flags & update_values)
                 out |= update_values | update_covariant_transformation;
 
@@ -2312,8 +2221,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
               break;
             }
 
-          default:
-            {
+            default: {
               Assert(false, ExcNotImplemented());
             }
         }
