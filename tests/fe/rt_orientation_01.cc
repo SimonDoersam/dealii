@@ -258,28 +258,41 @@ main(int /*argc*/, char ** /*argv*/)
     {
       RaviartThomas_PermutationSignTest<dim> fe(degree);
 
-      for (unsigned int config_switch = 0; config_switch < 8; ++config_switch)
+      for (unsigned int n_rotations = 0; n_rotations < 4; ++n_rotations)
         {
           tria_test.clear();
 
-          bool face_orientation = (((config_switch / 4) % 2) == 1);
-          bool face_flip        = (((config_switch / 2) % 2) == 1);
-          bool face_rotation    = ((config_switch % 2) == 1);
-
-          bool manipulate_first_cube = true;
-
-          GridGenerator::orientation_test_mesh(tria_test,
-                                               face_orientation,
-                                               face_flip,
-                                               face_rotation,
-                                               manipulate_first_cube);
+          // Mesh with roated faces
+          GridGenerator::moebius(triangulation_coarse,
+                                 /* n_cells */ 8,
+                                 /* n_rotations by pi/2*/ n_rotations,
+                                 /* R */ 2,
+                                 /* r */ 0.5);
 
           /*
            * Plot all info about how dofs would change in each of the two
            * cells of the test triangulation.
            */
           fe.plot_all_info(tria_test);
-        } // config_switch++
+        } // ++n_rotations
+
+      {
+        tria_test.clear();
+
+        // Mesh with non-standard faces
+        GridGenerator::hyper_shell(triangulation_coarse,
+                                   Point<dim>(),
+                                   1,
+                                   2,
+                                   /* n_cells */ 6,
+                                   /* colorize */ false);
+
+        /*
+         * Plot all info about how dofs would change in each of the two
+         * cells of the test triangulation.
+         */
+        fe.plot_all_info(tria_test);
+      }
 
       deallog << "****************" << std::endl;
 
