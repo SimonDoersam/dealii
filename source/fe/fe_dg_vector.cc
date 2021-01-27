@@ -33,12 +33,6 @@ FE_DGNedelec<dim, spacedim>::FE_DGNedelec(const unsigned int p)
   // We need to initialize the dof permuation table and the one for the sign
   // change.
   initialize_quad_dof_index_permutation_and_sign_change();
-
-  /*
-   * Do not throw an exception on cells with non-standard faces. DG elements
-   * should have no face dofs at all.
-   */
-  this->throw_exception_on_occurrance_of_nonstandard_faces = false;
 }
 
 
@@ -78,12 +72,6 @@ FE_DGRaviartThomas<dim, spacedim>::FE_DGRaviartThomas(const unsigned int p)
   // We need to initialize the dof permuation table and the one for the sign
   // change.
   initialize_quad_dof_index_permutation_and_sign_change();
-
-  /*
-   * Do not throw an exception on cells with non-standard faces. DG elements
-   * should have no face dofs at all.
-   */
-  this->throw_exception_on_occurrance_of_nonstandard_faces = false;
 }
 
 
@@ -123,12 +111,6 @@ FE_DGBDM<dim, spacedim>::FE_DGBDM(const unsigned int p)
   // We need to initialize the dof permuation table and the one for the sign
   // change.
   initialize_quad_dof_index_permutation_and_sign_change();
-
-  /*
-   * Do not throw an exception on cells with non-standard faces. DG elements
-   * should have no face dofs at all.
-   */
-  this->throw_exception_on_occurrance_of_nonstandard_faces = false;
 }
 
 

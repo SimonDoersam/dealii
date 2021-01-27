@@ -306,14 +306,6 @@ protected:
   initialize_quad_dof_index_permutation_and_sign_change();
 
   /**
-   * Must be set in a derived class, otherwise the standard is false. If this
-   * flag is true for a finite element derived from FE_PolyTensor an exception
-   * will be thrown on meshes that have cell with faces in non-standard
-   * orientation.
-   */
-  bool throw_exception_on_occurrance_of_nonstandard_faces;
-
-  /**
    * For faces with non-standard face_orientation in 3D, the dofs on faces
    * (quads) have to be permuted in order to be combined with the correct
    * shape functions and additionally can change the sign. Given a local dof @p index on a quad, return the
