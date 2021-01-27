@@ -32,6 +32,57 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace internal
+{
+  namespace FE_PolyTensor
+  {
+    namespace
+    {
+      template <int spacedim>
+      void
+      get_line_dof_sign_nedelec(
+        const dealii::Triangulation<1>::cell_iterator & /*cell*/,
+        const FiniteElement<1, spacedim> & /*fe*/,
+        const std::vector<MappingKind> & /*mapping_kind*/,
+        std::vector<double> & /*line_dof_sign*/)
+      {
+        // nothing to do in 1d
+      }
+
+
+
+      template <int spacedim>
+      void
+      get_line_dof_sign_nedelec(
+        const dealii::Triangulation<2>::cell_iterator & /*cell*/,
+        const FiniteElement<2, spacedim> & /*fe*/,
+        const std::vector<MappingKind> & /*mapping_kind*/,
+        std::vector<double> & /*line_dof_sign*/)
+      {
+        // TODO: think about what it would take here
+      }
+
+
+      template <int spacedim>
+      void
+      get_line_dof_sign_nedelec(
+        const dealii::Triangulation<3>::cell_iterator &cell,
+        const FiniteElement<3, spacedim> & /*fe*/,
+        const std::vector<MappingKind> &mapping_kind,
+        std::vector<double> &           line_dof_sign)
+      {
+        const unsigned int dim = 3;
+        // TODO: This is probably only going to work for those elements for
+        // which all dofs are face dofs
+        for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+          if (!(cell->line_orientation(l)) &&
+              mapping_kind[0] == mapping_nedelec)
+            line_dof_sign[l] = -1.0;
+      }
+    } // namespace
+  }   // namespace FE_PolyTensor
+} // namespace internal
+
 
 template <int dim, int spacedim>
 FE_PolyTensor<dim, spacedim>::FE_PolyTensor(
@@ -339,6 +390,17 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
            fe_data.shape_values.size()[1] == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values.size()[1], n_q_points));
 
+  // TODO: The line_dof_sign only affects Nedelec elements and is not the
+  // correct thing on complicated meshes for higher order Nedelec elements.
+  // Something similar to FE_Q should be done to permute dofs and to change the
+  // dof signs. A static way using tables (as done in the RaviartThomas<dim>
+  // class) is preferable.
+  std::fill(fe_data.line_dof_sign.begin(), fe_data.line_dof_sign.end(), 1.0);
+  internal::FE_PolyTensor::get_line_dof_sign_nedelec(cell,
+                                                     *this,
+                                                     this->mapping_kind,
+                                                     fe_data.line_dof_sign);
+
   // What is the first dof_index on a quad?
   const unsigned int first_quad_index = this->get_first_quad_index();
   // How many dofs per quad and how many quad dofs do we have at all?
@@ -381,6 +443,14 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
         }
 
       const MappingKind mapping_kind = get_mapping_kind(dof_index);
+
+      // TODO: The line_dof_sign only affects Nedelec elements and is not the
+      // correct thing on complicated meshes for higher order Nedelec elements.
+      // Something similar to FE_Q should be done to permute dofs and to change
+      // the dof signs. A static way using tables (as done in the
+      // RaviartThomas<dim> class) is preferable.
+      if (mapping_kind == mapping_nedelec)
+        dof_sign = fe_data.line_dof_sign[dof_index];
 
       const unsigned int first =
         output_data.shape_function_to_row_table
@@ -919,6 +989,17 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
 
   // TODO: Size assertions
 
+  // TODO: The line_dof_sign only affects Nedelec elements and is not the
+  // correct thing on complicated meshes for higher order Nedelec elements.
+  // Something similar to FE_Q should be done to permute dofs and to change the
+  // dof signs. A static way using tables (as done in the RaviartThomas<dim>
+  // class) is preferable.
+  std::fill(fe_data.line_dof_sign.begin(), fe_data.line_dof_sign.end(), 1.0);
+  internal::FE_PolyTensor::get_line_dof_sign_nedelec(cell,
+                                                     *this,
+                                                     this->mapping_kind,
+                                                     fe_data.line_dof_sign);
+
   // What is the first dof_index on a quad?
   const unsigned int first_quad_index = this->get_first_quad_index();
   // How many dofs per quad and how many quad dofs do we have at all?
@@ -962,6 +1043,14 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
         }
 
       const MappingKind mapping_kind = get_mapping_kind(dof_index);
+
+      // TODO: The line_dof_sign only affects Nedelec elements and is not the
+      // correct thing on complicated meshes for higher order Nedelec elements.
+      // Something similar to FE_Q should be done to permute dofs and to change
+      // the dof signs. A static way using tables (as done in the
+      // RaviartThomas<dim> class) is preferable.
+      if (mapping_kind == mapping_nedelec)
+        dof_sign = fe_data.line_dof_sign[dof_index];
 
       const unsigned int first =
         output_data.shape_function_to_row_table
@@ -1554,6 +1643,17 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
 
   // TODO: Size assertions
 
+  // TODO: The line_dof_sign only affects Nedelec elements and is not the
+  // correct thing on complicated meshes for higher order Nedelec elements.
+  // Something similar to FE_Q should be done to permute dofs and to change the
+  // dof signs. A static way using tables (as done in the RaviartThomas<dim>
+  // class) is preferable.
+  std::fill(fe_data.line_dof_sign.begin(), fe_data.line_dof_sign.end(), 1.0);
+  internal::FE_PolyTensor::get_line_dof_sign_nedelec(cell,
+                                                     *this,
+                                                     this->mapping_kind,
+                                                     fe_data.line_dof_sign);
+
   // What is the first dof_index on a quad?
   const unsigned int first_quad_index = this->get_first_quad_index();
   // How many dofs per quad and how many quad dofs do we have at all?
@@ -1597,6 +1697,14 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
         }
 
       const MappingKind mapping_kind = get_mapping_kind(dof_index);
+
+      // TODO: The line_dof_sign only affects Nedelec elements and is not the
+      // correct thing on complicated meshes for higher order Nedelec elements.
+      // Something similar to FE_Q should be done to permute dofs and to change
+      // the dof signs. A static way using tables (as done in the
+      // RaviartThomas<dim> class) is preferable.
+      if (mapping_kind == mapping_nedelec)
+        dof_sign = fe_data.line_dof_sign[dof_index];
 
       const unsigned int first =
         output_data.shape_function_to_row_table
