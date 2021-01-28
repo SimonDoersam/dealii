@@ -125,12 +125,14 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
 
   switch (dim)
     {
-        case 1: {
+      case 1:
+        {
           this->interface_constraints.reinit(0, 0);
           break;
         }
 
-        case 2: {
+      case 2:
+        {
           this->interface_constraints.reinit(2 * this->n_dofs_per_face(face_no),
                                              this->n_dofs_per_face(face_no));
 
@@ -145,7 +147,8 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
           break;
         }
 
-        case 3: {
+      case 3:
+        {
           this->interface_constraints.reinit(
             4 * (this->n_dofs_per_face(face_no) - this->degree),
             this->n_dofs_per_face(face_no));
@@ -587,7 +590,8 @@ FE_Nedelec<dim>::initialize_restriction()
 
   switch (dim)
     {
-        case 2: {
+      case 2:
+        {
           // First interpolate the shape
           // functions of the child cells
           // to the lowest order shape
@@ -1015,7 +1019,8 @@ FE_Nedelec<dim>::initialize_restriction()
           break;
         }
 
-        case 3: {
+      case 3:
+        {
           // First interpolate the shape
           // functions of the child cells
           // to the lowest order shape
@@ -2133,7 +2138,8 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
               else
                 return false;
 
-              default: {
+            default:
+              {
                 Assert(false, ExcNotImplemented());
                 return false;
               }
@@ -2311,13 +2317,15 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
               else
                 return false;
 
-              default: {
+            default:
+              {
                 Assert(false, ExcNotImplemented());
                 return false;
               }
           }
 
-        default: {
+      default:
+        {
           Assert(false, ExcNotImplemented());
           return false;
         }
@@ -2628,7 +2636,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
 
   switch (dim)
     {
-        case 2: {
+      case 2:
+        {
           for (unsigned int dof = 0; dof < this->n_dofs_per_face(face_no);
                ++dof)
             for (unsigned int q_point = 0; q_point < n_edge_quadrature_points;
@@ -2719,7 +2728,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
           break;
         }
 
-        case 3: {
+      case 3:
+        {
           const double shifts[4][2] = {{0.0, 0.0},
                                        {1.0, 0.0},
                                        {0.0, 1.0},
@@ -3158,7 +3168,8 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
 
   switch (dim)
     {
-        case 2: {
+      case 2:
+        {
           // Let us begin with the
           // interpolation part.
           const QGauss<dim - 1> reference_edge_quadrature(this->degree);
@@ -3227,7 +3238,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
               system_matrix_inv.invert(system_matrix);
 
               const unsigned int
-                line_coordinate[GeometryInfo<2>::lines_per_cell] = {1, 1, 0, 0};
+                             line_coordinate[GeometryInfo<2>::lines_per_cell] = {1, 1, 0, 0};
               Vector<double> system_rhs(system_matrix.m());
               Vector<double> solution(system_rhs.size());
 
@@ -3423,7 +3434,8 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
           break;
         }
 
-        case 3: {
+      case 3:
+        {
           // Let us begin with the
           // interpolation part.
           const QGauss<1>    reference_edge_quadrature(this->degree);

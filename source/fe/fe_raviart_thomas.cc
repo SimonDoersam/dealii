@@ -638,10 +638,12 @@ FE_RaviartThomas<dim>::has_support_on_face(const unsigned int shape_index,
   // is always safe to return true.
   switch (this->degree)
     {
-        case 1: {
+      case 1:
+        {
           switch (dim)
             {
-                case 2: {
+              case 2:
+                {
                   // only on the one
                   // non-adjacent face
                   // are the values

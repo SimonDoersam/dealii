@@ -532,10 +532,12 @@ FE_ABF<dim>::has_support_on_face(const unsigned int shape_index,
   // is always safe to return true.
   switch (rt_order)
     {
-        case 0: {
+      case 0:
+        {
           switch (dim)
             {
-                case 2: {
+              case 2:
+                {
                   // only on the one
                   // non-adjacent face
                   // are the values

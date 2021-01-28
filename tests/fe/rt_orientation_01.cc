@@ -253,6 +253,7 @@ main(int /*argc*/, char ** /*argv*/)
   Triangulation<dim> tria_test;
 
   deallog << "Testing 3D case:" << std::endl;
+  deallog << "(Moebius strip):" << std::endl;
 
   for (unsigned int degree = 0; degree < 3; ++degree)
     {
@@ -263,7 +264,7 @@ main(int /*argc*/, char ** /*argv*/)
           tria_test.clear();
 
           // Mesh with roated faces
-          GridGenerator::moebius(triangulation_coarse,
+          GridGenerator::moebius(tria_test,
                                  /* n_cells */ 8,
                                  /* n_rotations by pi/2*/ n_rotations,
                                  /* R */ 2,
@@ -274,31 +275,41 @@ main(int /*argc*/, char ** /*argv*/)
            * cells of the test triangulation.
            */
           fe.plot_all_info(tria_test);
+
+          deallog << std::endl << std::endl;
         } // ++n_rotations
+    }     // degree++
 
-      {
-        tria_test.clear();
+  deallog << "****************" << std::endl;
+  deallog << "(hyper shell):" << std::endl;
+  deallog << "****************" << std::endl;
 
-        // Mesh with non-standard faces
-        GridGenerator::hyper_shell(triangulation_coarse,
-                                   Point<dim>(),
-                                   1,
-                                   2,
-                                   /* n_cells */ 6,
-                                   /* colorize */ false);
+  for (unsigned int degree = 0; degree < 3; ++degree)
+    {
+      RaviartThomas_PermutationSignTest<dim> fe(degree);
 
-        /*
-         * Plot all info about how dofs would change in each of the two
-         * cells of the test triangulation.
-         */
-        fe.plot_all_info(tria_test);
-      }
+      tria_test.clear();
 
-      deallog << "****************" << std::endl;
+      // Mesh with non-standard faces
+      GridGenerator::hyper_shell(tria_test,
+                                 Point<dim>(),
+                                 1,
+                                 2,
+                                 /* n_cells */ 6,
+                                 /* colorize */ false);
 
+      /*
+       * Plot all info about how dofs would change in each of the two
+       * cells of the test triangulation.
+       */
+      fe.plot_all_info(tria_test);
+
+      deallog << std::endl << std::endl;
     } // degree++
 
-  deallog << "Testing 3D case done." << std::endl;
+  deallog << "****************" << std::endl;
+
+  deallog << std::endl << "Testing 3D case done." << std::endl;
 
   return 0;
 }
