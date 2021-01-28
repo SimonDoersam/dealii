@@ -56,6 +56,14 @@ pre-commit hook. One way to do so, is to copy
 <code>\${SOURCE_DIR}/contrib/git-hooks/pre-commit</code> to
 <code>\${SOURCE_DIR}/.git/hooks/pre-commit</code> and make sure it is
 executable.
+
+On some systems the command <code>clang-format</code> by default points to a
+newer version than v6.0 which is currently required by Deal.II. A simple fix
+for that issue is to point to the correct version with
+@code
+  make DEAL_II_CLANG_FORMAT=clang-format-6.0 indent
+@endcode
+provided <code>clang-format-6.0</code> is installed.
 </p>
 
 <h3>Style issues</h3>
