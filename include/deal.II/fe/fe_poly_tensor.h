@@ -378,7 +378,7 @@ protected:
     std::vector<Tensor<5, dim>> fourth_derivatives(0);
 
     if (update_flags & (update_values | update_gradients | update_hessians))
-      data.line_dof_sign.resize(this->dofs_per_cell);
+      data.dof_sign_change.resize(this->dofs_per_cell);
 
     // initialize fields only if really
     // necessary. otherwise, don't
@@ -574,7 +574,7 @@ protected:
     /**
      * Scratch arrays for intermediate computations
      */
-    mutable std::vector<double>              line_dof_sign;
+    mutable std::vector<double>              dof_sign_change;
     mutable std::vector<Tensor<1, spacedim>> transformed_shape_values;
     // for shape_gradient computations
     mutable std::vector<Tensor<2, spacedim>> transformed_shape_grads;

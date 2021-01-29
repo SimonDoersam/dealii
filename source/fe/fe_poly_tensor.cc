@@ -40,7 +40,80 @@ namespace internal
     {
       template <int spacedim>
       void
-      get_line_dof_sign_nedelec(
+      get_dof_sign_change_h_div(const dealii::Triangulation<1>::cell_iterator &,
+                                const FiniteElement<1, spacedim> &,
+                                const std::vector<MappingKind> &,
+                                std::vector<double> &)
+      {
+        // Nothing to do in 1D.
+      }
+
+
+      // TODO: This function is not a consistent fix of the orientation issue
+      // like in 3D. It is rather kept not to break legacy behavior in 2D but
+      // should be replaced. See also the implementation of
+      // FE_RaviartThomas<dim>::initialize_quad_dof_index_permutation_and_sign_change()
+      // or other H(div) conforming elements such as FE_ABF<dim> and
+      // FE_BDM<dim>.
+      void
+      get_dof_sign_change_h_div(
+        const dealii::Triangulation<2>::cell_iterator &cell,
+        const FiniteElement<2, 2> &                    fe,
+        const std::vector<MappingKind> &               mapping_kind,
+        std::vector<double> &                          face_sign)
+      {
+        const unsigned int dim      = 2;
+        const unsigned int spacedim = 2;
+
+        for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2;
+             f < GeometryInfo<dim>::faces_per_cell;
+             ++f)
+          {
+            dealii::Triangulation<dim, spacedim>::face_iterator face =
+              cell->face(f);
+            if (!face->at_boundary())
+              {
+                const unsigned int nn = cell->neighbor_face_no(f);
+
+                if (nn < GeometryInfo<dim>::faces_per_cell / 2)
+                  for (unsigned int j = 0; j < fe.dofs_per_face; ++j)
+                    {
+                      const unsigned int cell_j = fe.face_to_cell_index(j, f);
+
+                      Assert(f * fe.dofs_per_face + j < face_sign.size(),
+                             ExcInternalError());
+                      Assert(mapping_kind.size() == 1 ||
+                               cell_j < mapping_kind.size(),
+                             ExcInternalError());
+
+                      // TODO: This is probably only going to work for those
+                      // elements for which all dofs are face dofs
+                      if ((mapping_kind.size() > 1 ?
+                             mapping_kind[cell_j] :
+                             mapping_kind[0]) == mapping_raviart_thomas)
+                        face_sign[f * fe.dofs_per_face + j] = -1.0;
+                    }
+              }
+          }
+      }
+
+
+
+      template <int spacedim>
+      void
+      get_dof_sign_change_h_div(
+        const dealii::Triangulation<3>::cell_iterator & /*cell*/,
+        const FiniteElement<3, spacedim> & /*fe*/,
+        const std::vector<MappingKind> & /*mapping_kind*/,
+        std::vector<double> & /*face_sign*/)
+      {
+        // Nothing to do. In 3D we take care of it through the
+        // adjust_quad_dof_sign_for_face_orientation_table
+      }
+
+      template <int spacedim>
+      void
+      get_dof_sign_change_nedelec(
         const dealii::Triangulation<1>::cell_iterator & /*cell*/,
         const FiniteElement<1, spacedim> & /*fe*/,
         const std::vector<MappingKind> & /*mapping_kind*/,
@@ -53,7 +126,7 @@ namespace internal
 
       template <int spacedim>
       void
-      get_line_dof_sign_nedelec(
+      get_dof_sign_change_nedelec(
         const dealii::Triangulation<2>::cell_iterator & /*cell*/,
         const FiniteElement<2, spacedim> & /*fe*/,
         const std::vector<MappingKind> & /*mapping_kind*/,
@@ -65,7 +138,7 @@ namespace internal
 
       template <int spacedim>
       void
-      get_line_dof_sign_nedelec(
+      get_dof_sign_change_nedelec(
         const dealii::Triangulation<3>::cell_iterator &cell,
         const FiniteElement<3, spacedim> & /*fe*/,
         const std::vector<MappingKind> &mapping_kind,
@@ -390,16 +463,27 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
            fe_data.shape_values.size()[1] == n_q_points,
          ExcDimensionMismatch(fe_data.shape_values.size()[1], n_q_points));
 
-  // TODO: The line_dof_sign only affects Nedelec elements and is not the
+  // TODO: The dof_sign_change only affects Nedelec elements and is not the
   // correct thing on complicated meshes for higher order Nedelec elements.
   // Something similar to FE_Q should be done to permute dofs and to change the
   // dof signs. A static way using tables (as done in the RaviartThomas<dim>
   // class) is preferable.
-  std::fill(fe_data.line_dof_sign.begin(), fe_data.line_dof_sign.end(), 1.0);
-  internal::FE_PolyTensor::get_line_dof_sign_nedelec(cell,
+  std::fill(fe_data.dof_sign_change.begin(),
+            fe_data.dof_sign_change.end(),
+            1.0);
+  internal::FE_PolyTensor::get_dof_sign_change_nedelec(cell,
+                                                       *this,
+                                                       this->mapping_kind,
+                                                       fe_data.dof_sign_change);
+
+  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2D
+  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1D.
+  // Also nothing in 3D since we take care of it by using the
+  // adjust_quad_dof_sign_for_face_orientation_table.
+  internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
                                                      *this,
                                                      this->mapping_kind,
-                                                     fe_data.line_dof_sign);
+                                                     fe_data.dof_sign_change);
 
   // What is the first dof_index on a quad?
   const unsigned int first_quad_index = this->get_first_quad_index();
@@ -444,13 +528,13 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
 
       const MappingKind mapping_kind = get_mapping_kind(dof_index);
 
-      // TODO: The line_dof_sign only affects Nedelec elements and is not the
+      // TODO: The dof_sign_change only affects Nedelec elements and is not the
       // correct thing on complicated meshes for higher order Nedelec elements.
       // Something similar to FE_Q should be done to permute dofs and to change
       // the dof signs. A static way using tables (as done in the
       // RaviartThomas<dim> class) is preferable.
       if (mapping_kind == mapping_nedelec)
-        dof_sign = fe_data.line_dof_sign[dof_index];
+        dof_sign *= fe_data.dof_sign_change[dof_index];
 
       const unsigned int first =
         output_data.shape_function_to_row_table
@@ -1003,16 +1087,27 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
 
   // TODO: Size assertions
 
-  // TODO: The line_dof_sign only affects Nedelec elements and is not the
+  // TODO: The dof_sign_change only affects Nedelec elements and is not the
   // correct thing on complicated meshes for higher order Nedelec elements.
   // Something similar to FE_Q should be done to permute dofs and to change the
   // dof signs. A static way using tables (as done in the RaviartThomas<dim>
   // class) is preferable.
-  std::fill(fe_data.line_dof_sign.begin(), fe_data.line_dof_sign.end(), 1.0);
-  internal::FE_PolyTensor::get_line_dof_sign_nedelec(cell,
+  std::fill(fe_data.dof_sign_change.begin(),
+            fe_data.dof_sign_change.end(),
+            1.0);
+  internal::FE_PolyTensor::get_dof_sign_change_nedelec(cell,
+                                                       *this,
+                                                       this->mapping_kind,
+                                                       fe_data.dof_sign_change);
+
+  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2D
+  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1D.
+  // Also nothing in 3D since we take care of it by using the
+  // adjust_quad_dof_sign_for_face_orientation_table.
+  internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
                                                      *this,
                                                      this->mapping_kind,
-                                                     fe_data.line_dof_sign);
+                                                     fe_data.dof_sign_change);
 
   // What is the first dof_index on a quad?
   const unsigned int first_quad_index = this->get_first_quad_index();
@@ -1058,13 +1153,13 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
 
       const MappingKind mapping_kind = get_mapping_kind(dof_index);
 
-      // TODO: The line_dof_sign only affects Nedelec elements and is not the
+      // TODO: The dof_sign_change only affects Nedelec elements and is not the
       // correct thing on complicated meshes for higher order Nedelec elements.
       // Something similar to FE_Q should be done to permute dofs and to change
       // the dof signs. A static way using tables (as done in the
       // RaviartThomas<dim> class) is preferable.
       if (mapping_kind == mapping_nedelec)
-        dof_sign = fe_data.line_dof_sign[dof_index];
+        dof_sign *= fe_data.dof_sign_change[dof_index];
 
       const unsigned int first =
         output_data.shape_function_to_row_table
@@ -1671,16 +1766,27 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
 
   // TODO: Size assertions
 
-  // TODO: The line_dof_sign only affects Nedelec elements and is not the
+  // TODO: The dof_sign_change only affects Nedelec elements and is not the
   // correct thing on complicated meshes for higher order Nedelec elements.
   // Something similar to FE_Q should be done to permute dofs and to change the
   // dof signs. A static way using tables (as done in the RaviartThomas<dim>
   // class) is preferable.
-  std::fill(fe_data.line_dof_sign.begin(), fe_data.line_dof_sign.end(), 1.0);
-  internal::FE_PolyTensor::get_line_dof_sign_nedelec(cell,
+  std::fill(fe_data.dof_sign_change.begin(),
+            fe_data.dof_sign_change.end(),
+            1.0);
+  internal::FE_PolyTensor::get_dof_sign_change_nedelec(cell,
+                                                       *this,
+                                                       this->mapping_kind,
+                                                       fe_data.dof_sign_change);
+
+  // TODO: This, similarly to the Nedelec case, is just a legacy function in 2D
+  // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1D.
+  // Also nothing in 3D since we take care of it by using the
+  // adjust_quad_dof_sign_for_face_orientation_table.
+  internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
                                                      *this,
                                                      this->mapping_kind,
-                                                     fe_data.line_dof_sign);
+                                                     fe_data.dof_sign_change);
 
   // What is the first dof_index on a quad?
   const unsigned int first_quad_index = this->get_first_quad_index();
@@ -1726,13 +1832,13 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
 
       const MappingKind mapping_kind = get_mapping_kind(dof_index);
 
-      // TODO: The line_dof_sign only affects Nedelec elements and is not the
+      // TODO: The dof_sign_change only affects Nedelec elements and is not the
       // correct thing on complicated meshes for higher order Nedelec elements.
       // Something similar to FE_Q should be done to permute dofs and to change
       // the dof signs. A static way using tables (as done in the
       // RaviartThomas<dim> class) is preferable.
       if (mapping_kind == mapping_nedelec)
-        dof_sign = fe_data.line_dof_sign[dof_index];
+        dof_sign *= fe_data.dof_sign_change[dof_index];
 
       const unsigned int first =
         output_data.shape_function_to_row_table

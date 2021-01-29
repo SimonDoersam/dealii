@@ -256,7 +256,11 @@ template <int dim>
 void
 FE_RaviartThomas<dim>::initialize_quad_dof_index_permutation_and_sign_change()
 {
-  // for 1D and 2D, do nothing
+  // For 1D do nothing.
+  //
+  // TODO: For 2D we simply keep the legacy behavior for now. This should be
+  // changed in the future and can be taken care of by similar means as the 3D
+  // case below.
   if (dim < 3)
     return;
 
