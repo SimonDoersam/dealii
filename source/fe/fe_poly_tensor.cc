@@ -528,14 +528,6 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
 
       const MappingKind mapping_kind = get_mapping_kind(dof_index);
 
-      // TODO: The dof_sign_change only affects Nedelec elements and is not the
-      // correct thing on complicated meshes for higher order Nedelec elements.
-      // Something similar to FE_Q should be done to permute dofs and to change
-      // the dof signs. A static way using tables (as done in the
-      // RaviartThomas<dim> class) is preferable.
-      if (mapping_kind == mapping_nedelec)
-        dof_sign *= fe_data.dof_sign_change[dof_index];
-
       const unsigned int first =
         output_data.shape_function_to_row_table
           [dof_index * this->n_components() +
@@ -576,7 +568,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        dof_sign * fe_data.transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_values[k][d];
 
                   break;
                 }
@@ -592,7 +585,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        dof_sign * fe_data.transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_values[k][d];
                   break;
                 }
 
@@ -607,7 +601,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        dof_sign * fe_data.transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_values[k][d];
 
                   break;
                 }
@@ -637,7 +632,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * fe_data.transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_grads[k][d];
                   break;
                 }
               case mapping_covariant:
@@ -658,7 +654,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * fe_data.transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -684,7 +681,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * fe_data.transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -713,7 +711,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * fe_data.transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -750,7 +749,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * fe_data.transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -788,7 +788,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * fe_data.transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -830,7 +831,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * fe_data.transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -889,7 +891,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * fe_data.transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -981,7 +984,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * fe_data.transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -1024,7 +1028,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * fe_data.transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        fe_data.transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -1153,14 +1158,6 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
 
       const MappingKind mapping_kind = get_mapping_kind(dof_index);
 
-      // TODO: The dof_sign_change only affects Nedelec elements and is not the
-      // correct thing on complicated meshes for higher order Nedelec elements.
-      // Something similar to FE_Q should be done to permute dofs and to change
-      // the dof signs. A static way using tables (as done in the
-      // RaviartThomas<dim> class) is preferable.
-      if (mapping_kind == mapping_nedelec)
-        dof_sign *= fe_data.dof_sign_change[dof_index];
-
       const unsigned int first =
         output_data.shape_function_to_row_table
           [dof_index * this->n_components() +
@@ -1198,7 +1195,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        dof_sign * transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_values[k][d];
 
                   break;
                 }
@@ -1220,7 +1218,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        dof_sign * transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_values[k][d];
                   break;
                 }
 
@@ -1242,7 +1241,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        dof_sign * transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_values[k][d];
 
                   break;
                 }
@@ -1270,7 +1270,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
                   break;
                 }
 
@@ -1296,7 +1297,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
                   break;
                 }
 
@@ -1327,7 +1329,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -1363,7 +1366,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -1406,7 +1410,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -1445,7 +1450,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -1493,7 +1499,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -1558,7 +1565,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -1655,7 +1663,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -1704,7 +1713,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -1832,14 +1842,6 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
 
       const MappingKind mapping_kind = get_mapping_kind(dof_index);
 
-      // TODO: The dof_sign_change only affects Nedelec elements and is not the
-      // correct thing on complicated meshes for higher order Nedelec elements.
-      // Something similar to FE_Q should be done to permute dofs and to change
-      // the dof signs. A static way using tables (as done in the
-      // RaviartThomas<dim> class) is preferable.
-      if (mapping_kind == mapping_nedelec)
-        dof_sign *= fe_data.dof_sign_change[dof_index];
-
       const unsigned int first =
         output_data.shape_function_to_row_table
           [dof_index * this->n_components() +
@@ -1877,7 +1879,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        dof_sign * transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_values[k][d];
 
                   break;
                 }
@@ -1901,7 +1904,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        dof_sign * transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_values[k][d];
                   break;
                 }
 
@@ -1924,7 +1928,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_values(first + d, k) =
-                        dof_sign * transformed_shape_values[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_values[k][d];
 
                   break;
                 }
@@ -1952,7 +1957,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
                   break;
                 }
 
@@ -1974,7 +1980,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -2003,7 +2010,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -2036,7 +2044,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -2074,7 +2083,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -2113,7 +2123,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -2161,7 +2172,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -2226,7 +2238,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -2322,7 +2335,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -2371,7 +2385,8 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < dim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        fe_data.dof_sign_change[dof_index] * dof_sign *
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }

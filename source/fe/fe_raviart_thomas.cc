@@ -260,7 +260,8 @@ FE_RaviartThomas<dim>::initialize_quad_dof_index_permutation_and_sign_change()
   //
   // TODO: For 2D we simply keep the legacy behavior for now. This should be
   // changed in the future and can be taken care of by similar means as the 3D
-  // case below.
+  // case below. The legacy behavior can be found in fe_poly_tensor.cc in the
+  // function internal::FE_PolyTensor::get_dof_sign_change_h_div(...)
   if (dim < 3)
     return;
 
